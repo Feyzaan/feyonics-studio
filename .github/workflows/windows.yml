@@ -1,5 +1,7 @@
 name: windows-build
 on: [push, workflow_dispatch]
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: windows-latest
@@ -13,3 +15,10 @@ jobs:
         with:
           name: feyonics-studio-windows
           path: target/release/feyonics-studio.exe
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view latest >/dev/null 2>&1 || gh release create latest --title "Feyonics Studio (latest build)" --notes "Newest build from main. Unsigned: Windows SmartScreen may warn."
+          gh release upload latest target/release/feyonics-studio.exe --clobber
