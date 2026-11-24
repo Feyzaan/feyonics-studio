@@ -1,0 +1,18 @@
+[package]
+name = "feyonics-studio"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+studio-core = { path = "../studio-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tiny_http = "0.12"
+serialport = { version = "4", default-features = false }
+
+[target.'cfg(windows)'.dependencies]
+btleplug = "0.11"
+midir = "0.10"
+tokio = { version = "1", features = ["rt-multi-thread", "time", "macros"] }
+futures = "0.3"
+uuid = "1"

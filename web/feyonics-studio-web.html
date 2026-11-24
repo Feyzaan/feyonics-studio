@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feyonics Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#f4f4f2;--dim:#a3a3a0;--faint:#6d6d6a;--glass:rgba(255,255,255,.07);--glass2:rgba(255,255,255,.12);--line:rgba(255,255,255,.14);--card:#161616;--white:#f4f4f2;--onwhite:#141414;--bad:#ff8a80;--field:rgba(0,0,0,.35);
+--bg:radial-gradient(1200px 700px at 15% -10%,#3a3a3a 0,transparent 60%),radial-gradient(900px 600px at 100% 110%,#2b2b2b 0,transparent 55%),#0c0c0c;
+--sans:"Instrument Sans","Segoe UI Variable","Segoe UI",system-ui,sans-serif;--serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"IBM Plex Mono",Consolas,ui-monospace,monospace}
+body[data-theme=paper]{--ink:#1d1b16;--dim:#5f5a4d;--faint:#8e8878;--glass:rgba(255,255,255,.55);--glass2:rgba(0,0,0,.07);--line:rgba(0,0,0,.14);--card:#fbf8f0;--white:#1d1b16;--onwhite:#f4efe3;--bad:#b3261e;--field:rgba(255,255,255,.8);--bg:#ece5d4}
+body[data-theme=ocean]{--ink:#e6f2f6;--dim:#93b0ba;--faint:#5d7c88;--glass:rgba(160,220,240,.07);--glass2:rgba(160,220,240,.13);--line:rgba(160,220,240,.18);--card:#0b1f2a;--white:#e6f2f6;--onwhite:#08141c;--field:rgba(0,10,16,.45);--bg:radial-gradient(1100px 700px at 10% -10%,#154458 0,transparent 60%),#08141c}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:15px/1.45 var(--sans);color:var(--ink);background:var(--bg);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:18px;padding:18px;min-height:100%}
+.side{position:sticky;top:18px;align-self:start;height:calc(100vh - 36px);background:var(--glass);border:1px solid var(--line);border-radius:26px;backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);padding:20px 14px;display:flex;flex-direction:column;gap:6px}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 10px 18px;font-weight:700;letter-spacing:.02em}
+.logo i{width:26px;height:26px;border-radius:9px;background:var(--white);display:block;position:relative}.logo i:after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--onwhite)}
+.nav{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;color:var(--dim);background:none;border:0;font:inherit;text-align:left;cursor:pointer}
+.nav:hover{background:var(--glass)}.nav[aria-current=page]{background:var(--white);color:var(--onwhite);font-weight:600}.nav .tag{margin-left:auto;font-size:11px;opacity:.75}
+:focus-visible{outline:2px solid var(--white);outline-offset:2px}
+.sp{flex:1}.foot{color:var(--faint);font-size:12px;padding:0 10px}
+main{display:grid;gap:18px;align-content:start;min-width:0}
+h1{font:600 30px/1.1 var(--serif);margin:6px 4px 0;letter-spacing:-.01em}h2{font:600 22px/1.15 var(--serif);margin:0}.sub{color:var(--dim);margin:0 4px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+.card{border-radius:26px;padding:22px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);min-width:0}
+.card.dark{background:var(--card)}.card.white{background:var(--white);color:var(--onwhite);border-color:transparent}.card.white .dim{color:#5f5f5c}
+.c4{grid-column:span 4}.c5{grid-column:span 5}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+@media(max-width:1100px){.c4,.c5,.c7,.c8{grid-column:span 12}}
+@media(max-width:760px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap}.sp,.foot{display:none}}
+.dim{color:var(--dim)}.lab{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.card.white .lab{color:#6a6a66}
+.big{font:600 40px/1.05 var(--serif);letter-spacing:-.02em;margin:8px 0 4px}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 12px;background:var(--glass2);font-size:13px}.card.white .pill{background:rgba(0,0,0,.08)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}.dot.on{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.2)}.card.white .dot.on{background:#141414;box-shadow:0 0 0 4px rgba(0,0,0,.15)}.dot.warn{background:#e8c26a}
+.btn{border:1px solid var(--line);background:var(--glass2);color:var(--ink);border-radius:999px;padding:9px 18px;font:inherit;font-weight:600;cursor:pointer;min-height:40px}
+.btn:hover{filter:brightness(1.15)}.btn.solid{background:var(--white);color:var(--onwhite);border-color:transparent}.btn.small{min-height:34px;padding:5px 13px;font-size:13px}.btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+.btn[disabled]{opacity:.45;cursor:default}.card.white .btn{background:var(--onwhite);color:var(--white);border-color:transparent}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row.sb{justify-content:space-between}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.stat{background:var(--glass);border-radius:16px;padding:12px}.card.white .stat{background:rgba(0,0,0,.07)}.stat b{display:block;font:500 22px var(--mono)}
+.log{font:12px/1.55 var(--mono);color:var(--dim);height:200px;overflow:auto;white-space:pre-wrap;margin-top:12px;padding-right:6px}
+.err{color:var(--bad);margin-top:10px;font-size:14px}.ok{color:var(--ink)}
+.form{display:grid;gap:12px;margin-top:14px}.form label,.fl{display:grid;gap:6px;color:var(--dim);font-size:13px}
+input,select,textarea{background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font:inherit;min-height:40px;width:100%}
+input[type=checkbox]{width:20px;min-height:20px;height:20px}input[type=range]{padding:0;accent-color:var(--white)}
+.mono{font-family:var(--mono)}.page[hidden],[hidden]{display:none!important}
+.help{font-size:13px;color:var(--dim);margin:10px 0 0}.help b{color:var(--ink)}
+.badge{border-radius:999px;padding:3px 10px;font:600 12px var(--mono);background:var(--white);color:var(--onwhite)}
+/* macro editor */
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:none;color:var(--dim);border-radius:999px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}
+.tab[aria-selected=true]{background:var(--white);color:var(--onwhite);border-color:transparent}
+.lstrip{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}.lbtn{flex:none;border:1px solid var(--line);background:var(--glass);color:var(--ink);border-radius:14px;padding:8px 12px;font:inherit;cursor:pointer;text-align:left;min-width:92px}
+.lbtn small{display:block;font:11px var(--mono);color:var(--dim)}.lbtn[aria-pressed=true]{background:var(--white);color:var(--onwhite)}.lbtn[aria-pressed=true] small{color:#555}.lbtn.off{opacity:.45}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:520px}
+.tile{aspect-ratio:1/.82;border-radius:18px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 10px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;min-width:0}
+.tile .t{font:500 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}.tile .n{font:600 17px/1.1 var(--serif);word-break:break-word}
+.tile.none{background:transparent;border-style:dashed}.tile.knob{border-style:dotted}.tile[aria-pressed=true]{background:var(--white);color:var(--onwhite)}.tile[aria-pressed=true] .t{color:#555}.tile.mod{box-shadow:inset 0 0 0 1.5px var(--white)}
+.krow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.kslot{flex:1;min-width:150px;aspect-ratio:auto;padding:10px 12px}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px}@media(max-width:1000px){.split{grid-template-columns:1fr}}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}th{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:6px 6px}td{padding:5px 6px;border-top:1px solid var(--line);vertical-align:middle}
+td input,td select{min-height:34px;padding:5px 9px}
+.save{position:sticky;bottom:14px;z-index:4;display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 16px;border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+iframe#mframe{width:100%;height:calc(100vh - 190px);min-height:560px;border:1px solid var(--line);border-radius:22px;background:#fff}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--white);color:var(--onwhite);padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90vw}.toast.show{opacity:1}
+main>*,.page,#macroUI,#midiUI,#mBody{min-width:0}#macroUI{padding-bottom:64px}.lstrip{max-width:100%}
+.card.white input,.card.white select,.card.white textarea{background:rgba(0,0,0,.06);color:var(--onwhite);border-color:rgba(0,0,0,.18)}.card.white .fl,.card.white label{color:#4f4f4c}.card.white .help{color:#5f5f5c}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body data-theme="dark"><div class="app">
+<nav class="side" aria-label="Sections">
+  <div class="logo"><i></i>Feyonics Studio</div>
+  <button class="nav" data-p="bridge" aria-current="page">Bluetooth bridge <span class="tag" id="navB"></span></button>
+  <button class="nav" data-p="serial">Serial MIDI <span class="tag" id="navS"></span></button>
+  <button class="nav" data-p="pads">My pads <span class="tag" id="navP"></span></button>
+  <button class="nav" data-p="settings">Settings</button>
+  <div class="sp"></div><div class="foot" id="foot">web version</div>
+</nav>
+<main>
+
+<section class="page" id="p-bridge">
+  <h1>Bluetooth bridge</h1><p class="sub">Your pad, over Bluetooth, shows up as MIDI in any music app. Keep this tab open while you play.</p>
+  <div class="grid" style="margin-top:18px">
+    <div class="card white c7">
+      <div class="row sb"><span class="lab">Pad</span><span class="pill"><span class="dot" id="bDot"></span><span id="bPhase">Idle</span></span></div>
+      <div class="big" id="bDev">Pad not connected</div>
+      <div class="dim" id="bSub">Turn the pad on, then press Connect and pick it from the list.</div>
+      <div class="row" style="margin-top:16px"><button class="btn" id="bConnect">Connect pad</button></div>
+      <div class="stats">
+        <div class="stat"><span class="lab">Messages</span><b id="sMsg">0</b></div>
+        <div class="stat"><span class="lab">Packets</span><b id="sPkt">0</b></div>
+        <div class="stat"><span class="lab">Held notes</span><b id="sHeld">0</b></div>
+        <div class="stat"><span class="lab">Reconnects</span><b id="sRec">0</b></div>
+      </div>
+    </div>
+    <div class="card dark c5">
+      <span class="lab">MIDI output</span>
+      <div class="form" style="margin-top:10px"><label>Send the pad's notes to<select id="bOut"><option value="">No output chosen</option></select></label></div>
+      <div class="err" id="bErr" hidden></div>
+      <div class="row" style="margin-top:14px"><button class="btn solid" id="bTest">Send test note</button></div>
+      <p class="help">A browser cannot create a MIDI port by itself. Make one first, then pick it here and choose the same port as the MIDI input in your music app. See Settings for how.</p>
+    </div>
+    <div class="card c12"><span class="lab">Activity</span><div class="log" id="bLog"></div></div>
+  </div>
+</section>
+
+<section class="page" id="p-serial" hidden>
+  <h1>Serial MIDI</h1><p class="sub">For boards that send raw MIDI bytes over a serial port. This takes over the job of Hairless MIDI to Serial: serial in, MIDI out, and back.</p>
+  <div class="grid" style="margin-top:18px">
+    <div class="card white c7">
+      <div class="row sb"><span class="lab">Serial port</span><span class="pill"><span class="dot" id="smDot"></span><span id="smPhase">Closed</span></span></div>
+      <div class="big" id="smDev">No port open</div>
+      <div class="dim" id="smSub">Plug the board in, choose the speed it uses, then press Open port.</div>
+      <div class="row" style="margin-top:16px"><label class="fl" style="min-width:150px">Speed (baud)<select id="smBaud"><option>115200</option><option>31250</option><option>38400</option><option>57600</option><option>9600</option><option>230400</option><option>250000</option></select></label><button class="btn" id="smConnect" style="align-self:end">Open port</button></div>
+      <div class="stats"><div class="stat"><span class="lab">From serial</span><b id="smIn">0</b></div><div class="stat"><span class="lab">To serial</span><b id="smOutN">0</b></div><div class="stat"><span class="lab">Held notes</span><b id="smHeld">0</b></div><div class="stat"><span class="lab">Skipped</span><b id="smSkip">0</b></div></div>
+    </div>
+    <div class="card dark c5"><span class="lab">MIDI ports</span>
+      <div class="form"><label>Serial to this MIDI output<select id="smOut"><option value="">No output chosen</option></select></label>
+      <label>This MIDI input to serial (optional)<select id="smMidiIn"><option value="">None</option></select></label></div>
+      <p class="help">Use two different virtual ports for output and input, or the same notes will loop back. The pad's own USB port that Studio edits with <span class="mono">KM</span> commands is a different thing: use My pads for that.</p></div>
+    <div class="card c12"><span class="lab">Activity</span><div class="log" id="smLog"></div></div>
+  </div>
+</section>
+
+<section class="page" id="p-pads" hidden>
+  <h1>My pads</h1><p class="sub">Plug the pad in with USB. Studio asks it which firmware it runs and opens the matching editor.</p>
+  <div id="padHome" class="grid" style="margin-top:18px">
+    <div class="card c7">
+      <span class="lab">USB</span>
+      <div class="big" style="font-size:30px">Connect a pad</div>
+      <p class="dim">Press the button and pick the pad's serial port in the list. Close any other app that uses it (the old editor, a serial monitor).</p>
+      <div class="row"><button class="btn solid" id="pConnect">Connect pad over USB</button><button class="btn" id="pDemoMacro">Try a demo macro pad</button><button class="btn" id="pDemoMidi">Try a demo MIDI pad</button></div>
+      <div class="err" id="pErr" hidden></div>
+    </div>
+    <div class="card dark c5"><span class="lab">How detection works</span><p class="dim">Studio sends <span class="mono">KM HELLO</span>. A macro pad answers with protocol 1, a MIDI pad with protocol 2 and its setup size. You never choose the editor yourself.</p></div>
+  </div>
+  <div id="padHead" class="card" style="margin-top:18px" hidden>
+    <div class="row sb"><div><span class="lab" id="phKind"></span><h2 id="phName">Pad</h2></div>
+      <div class="row"><span class="pill"><span class="dot on"></span><span id="phFw"></span></span><button class="btn small" id="phBack" hidden>Back to pad</button><button class="btn small" id="phDisc">Disconnect</button></div></div>
+  </div>
+  <div id="macroUI" hidden style="margin-top:18px"></div>
+  <div id="midiUI" hidden style="margin-top:18px">
+    <div id="midiLoad" class="card"><span class="lab">MIDI pad editor</span><p class="dim">This editor is the separate page <span class="mono">feyonics-studio.html</span>. Studio can't find it next to itself. Choose the file once and Studio remembers it in this browser.</p><div class="row"><input type="file" id="midiFile" accept=".html,text/html" style="max-width:340px"><span class="dim" id="midiMsg"></span></div></div>
+    <iframe id="mframe" title="MIDI pad editor" allow="serial; bluetooth; midi; autoplay" hidden></iframe>
+  </div>
+  <div class="card" style="margin-top:18px"><div class="row sb"><span class="lab">Serial log</span><button class="btn small" id="slClear">Clear</button></div><div class="log" id="sLog" style="height:150px"></div></div>
+</section>
+
+<section class="page" id="p-settings" hidden>
+  <h1>Settings</h1><p class="sub">Saved in this browser.</p>
+  <div class="grid" style="margin-top:18px">
+    <div class="card c5"><span class="lab">Look</span><div class="form"><label>Theme<select id="sTheme"><option value="dark">Dark</option><option value="paper">Paper</option><option value="ocean">Ocean</option></select></label></div></div>
+    <div class="card c7"><span class="lab">Making a MIDI port to send into</span>
+      <p class="help"><b>Windows 11:</b> install Windows MIDI Services and add a loopback pair named "Feyonics Pad" in its settings.<br><b>Windows 10 (or if unsure):</b> install loopMIDI (free), press + once to add a port named "Feyonics Pad". Leave loopMIDI running.<br>Then pick that port under Bluetooth bridge and choose the same port as the MIDI input in your music app.</p>
+      <p class="help"><b>Limits of the web version:</b> Chrome or Edge only, the tab has to stay open, Studio does not start with Windows, and only one app can hold the pad's USB port at a time.</p></div>
+  </div>
+</section>
+</main></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3200)}
+const store={get(k,d){try{const v=localStorage.getItem('feyonics-web-'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('feyonics-web-'+k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- navigation and theme ---------- */
+$$('.nav').forEach(b=>b.onclick=()=>show(b.dataset.p));
+function show(p){$$('.nav').forEach(x=>{if(x.dataset.p===p)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')});$$('.page').forEach(s=>s.hidden=s.id!=='p-'+p)}
+function applyTheme(t){document.body.dataset.theme=t;$('#sTheme').value=t}
+$('#sTheme').onchange=e=>{store.set('theme',e.target.value);applyTheme(e.target.value)};applyTheme(store.get('theme','dark'));
+
+/* ---------- hex helpers (printable ASCII only, like the firmware) ---------- */
+const toHex=s=>{const b=[...String(s)].map(c=>{const x=c.charCodeAt(0);return x>=32&&x<127?x:63});return b.length?b.map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase():'-'};
+const fromHex=h=>(!h||h==='-')?'':String.fromCharCode(...(h.match(/../g)||[]).map(x=>parseInt(x,16)));
+const ascii=(s,n)=>[...String(s)].map(c=>{const x=c.charCodeAt(0);return x>=32&&x<127?c:'?'}).join('').slice(0,n);
+
+/* ============================================================
+   BLUETOOTH BRIDGE (BLE-MIDI -> Web MIDI output)
+   ============================================================ */
+const BLE_SVC='03b80e5a-ede8-4b33-a751-6ce34ec4c700',BLE_CHR='7772e5db-3868-4112-a1a9-f2669d106bf3';
+function bleParse(v){const d=new Uint8Array(v.buffer,v.byteOffset,v.byteLength),out=[];let i=1,st=0;
+  while(i<d.length){if(!(d[i]&0x80)){i++;continue}i++;if(i<d.length&&(d[i]&0x80))st=d[i++];
+    if(st>=0xF0){while(i<d.length&&!(d[i]&0x80))i++;continue}
+    const need=(st&0xF0)===0xC0||(st&0xF0)===0xD0?1:2,m=[st];while(m.length<=need&&i<d.length&&!(d[i]&0x80))m.push(d[i++]);if(m.length===need+1)out.push(m)}
+  return out}
+const bridge={dev:null,chr:null,access:null,out:null,held:new Set(),sus:new Set(),msgs:0,pkts:0,recs:0,phase:'idle',want:false,retry:0,timer:null,name:''};
+const BACKOFF=[1,2,3,4,5];
+function bLog(s){const el=$('#bLog');el.textContent+=new Date().toTimeString().slice(0,8)+'  '+s+'\n';if(el.textContent.length>9000)el.textContent=el.textContent.slice(-6000);el.scrollTop=1e9}
+function bUi(){const ph={idle:'Idle',connecting:'Connecting',connected:'Connected',reconnecting:'Reconnecting'}[bridge.phase];$('#bPhase').textContent=ph;$('#bDot').className='dot'+(bridge.phase==='connected'?' on':bridge.phase==='idle'?'':' warn');
+  $('#bDev').textContent=bridge.phase==='connected'?bridge.name:bridge.phase==='idle'?'Pad not connected':bridge.phase==='reconnecting'?'Reconnecting…':'Connecting…';
+  $('#bSub').textContent=bridge.phase==='connected'?(bridge.out?'Playing the pad now sends notes to '+bridge.out.name+'.':'Connected. Choose a MIDI output on the right so the notes go somewhere.'):bridge.phase==='idle'?'Turn the pad on, then press Connect and pick it from the list.':'Keep the pad on. Studio retries by itself.';
+  $('#bConnect').textContent=bridge.want?'Disconnect':'Connect pad';$('#sMsg').textContent=bridge.msgs;$('#sPkt').textContent=bridge.pkts;$('#sHeld').textContent=bridge.held.size;$('#sRec').textContent=bridge.recs;
+  $('#navB').textContent=bridge.phase==='connected'?'on':''}
+function midiSend(b){if(!bridge.out)return false;try{bridge.out.send(b);return true}catch(e){$('#bErr').hidden=false;$('#bErr').textContent='MIDI output error: '+e.message;return false}}
+function track(m){const k=m[0]&0xF0,ch=m[0]&15;
+  if(k===0x90&&m[2]>0)bridge.held.add(ch*256+m[1]);else if(k===0x80||(k===0x90&&m[2]===0))bridge.held.delete(ch*256+m[1]);
+  else if(k===0xB0&&m[1]===64){if(m[2]>=64)bridge.sus.add(ch);else bridge.sus.delete(ch)}}
+function releaseAll(){const n=bridge.held.size+bridge.sus.size;bridge.held.forEach(x=>midiSend([0x80|(x>>8),x&255,0]));bridge.sus.forEach(ch=>midiSend([0xB0|ch,64,0]));bridge.held.clear();bridge.sus.clear();if(n)bLog('released '+n+' stuck note/pedal states')}
+function onBle(e){bridge.pkts++;for(const m of bleParse(e.target.value)){bridge.msgs++;track(m);midiSend(m);if(bridge.msgs<400||bridge.msgs%50===0)bLog(m.map(x=>x.toString(16).padStart(2,'0')).join(' '))}bUi()}
+async function bleHook(dev){
+  const srv=await dev.gatt.connect(),svc=await srv.getPrimaryService(BLE_SVC),chr=await svc.getCharacteristic(BLE_CHR);
+  if(bridge.chr)try{bridge.chr.removeEventListener('characteristicvaluechanged',onBle)}catch(e){}
+  await chr.startNotifications();chr.addEventListener('characteristicvaluechanged',onBle);bridge.chr=chr;bridge.phase='connected';bridge.retry=0;bridge.name=dev.name||'Pad';bLog('connected to '+bridge.name);bUi()}
+function onGattDown(){if(!bridge.want)return;releaseAll();bridge.phase='reconnecting';bLog('Bluetooth link lost');bUi();scheduleRetry()}
+function scheduleRetry(){clearTimeout(bridge.timer);const s=BACKOFF[Math.min(bridge.retry,BACKOFF.length-1)];bridge.retry++;bridge.timer=setTimeout(async()=>{if(!bridge.want)return;try{await bleHook(bridge.dev);bridge.recs++;bLog('reconnected');bUi()}catch(e){bLog('retry failed: '+(e.message||e));if(bridge.want)scheduleRetry()}},s*1000)}
+async function bridgeConnect(){
+  if(bridge.want){bridge.want=false;clearTimeout(bridge.timer);releaseAll();try{bridge.chr&&bridge.chr.removeEventListener('characteristicvaluechanged',onBle)}catch(e){}try{bridge.dev.gatt.disconnect()}catch(e){}bridge.phase='idle';bridge.chr=null;bLog('disconnected');bUi();return}
+  if(!navigator.bluetooth){toast('This browser has no Web Bluetooth. Use Chrome or Edge.');return}
+  try{bridge.phase='connecting';bUi();
+    const dev=await navigator.bluetooth.requestDevice({filters:[{services:[BLE_SVC]}],optionalServices:[BLE_SVC]});
+    if(bridge.dev&&bridge.dev!==dev)try{bridge.dev.removeEventListener('gattserverdisconnected',onGattDown)}catch(e){}
+    bridge.dev=dev;dev.removeEventListener('gattserverdisconnected',onGattDown);dev.addEventListener('gattserverdisconnected',onGattDown);bridge.want=true;
+    await bleHook(dev)}
+  catch(e){bridge.want=false;bridge.phase='idle';if(e.name!=='NotFoundError')toast('Bluetooth: '+(e.message||e));bUi()}}
+$('#bConnect').onclick=bridgeConnect;
+async function initMidi(){
+  if(!navigator.requestMIDIAccess){$('#bErr').hidden=false;$('#bErr').textContent='This browser has no Web MIDI. Use Chrome or Edge.';return}
+  try{bridge.access=await navigator.requestMIDIAccess();bridge.access.onstatechange=fillOuts;fillOuts()}catch(e){$('#bErr').hidden=false;$('#bErr').textContent='MIDI access was not allowed: '+e.message}}
+function fillOuts(){const sel=$('#bOut'),want=store.get('out','');sel.innerHTML='<option value="">No output chosen</option>';
+  const list=[...bridge.access.outputs.values()];list.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;sel.appendChild(o)});
+  const keep=bridge.out&&list.find(p=>p.id===bridge.out.id),pick=keep||list.find(p=>p.name===want)||list.find(p=>/feyonics|loop/i.test(p.name));
+  sel.value=pick?pick.id:'';useOut();fillSerialPorts(list)}
+function useOut(){releaseAll();const id=$('#bOut').value;bridge.out=id&&bridge.access?bridge.access.outputs.get(id):null;if(bridge.out)store.set('out',bridge.out.name);$('#bErr').hidden=true;bUi()}
+$('#bOut').onchange=useOut;
+$('#bTest').onclick=()=>{if(!bridge.out){toast('Choose a MIDI output first.');return}midiSend([0x90,60,100]);setTimeout(()=>midiSend([0x80,60,0]),300);bLog('test note sent to '+bridge.out.name)};
+initMidi();bUi();
+
+
+/* ============================================================
+   SERIAL MIDI (raw MIDI bytes over a serial port <-> Web MIDI)
+   ============================================================ */
+function MidiParser(emit){let st=0,need=0,buf=[],sys=null;
+  return b=>{
+    if(b>=0xF8){emit([b]);return}
+    if(b&0x80){
+      if(b===0xF0){sys=[b];st=0;return}
+      if(b===0xF7){if(sys){sys.push(b);emit(sys)}sys=null;return}
+      sys=null;
+      if(b>=0xF1&&b<=0xF6){if(b===0xF6){emit([b]);st=0;return}st=b;need=(b===0xF1||b===0xF3)?1:2;buf=[b];return}
+      st=b;need=((b&0xF0)===0xC0||(b&0xF0)===0xD0)?1:2;buf=[b];return}
+    if(sys){sys.push(b);return}
+    if(!st)return;
+    buf.push(b);
+    if(buf.length===need+1){emit(buf.slice());if(st>=0xF0){st=0;buf=[]}else buf=[st]}}}
+const sm={port:null,reader:null,writer:null,want:false,out:null,inp:null,held:new Set(),sus:new Set(),nIn:0,nOut:0,skip:0};
+function smLog(t){const el=$('#smLog');el.textContent+=new Date().toTimeString().slice(0,8)+'  '+t+'\n';if(el.textContent.length>9000)el.textContent=el.textContent.slice(-6000);el.scrollTop=1e9}
+function smUi(){const on=!!sm.port&&sm.want;$('#smPhase').textContent=on?'Open':'Closed';$('#smDot').className='dot'+(on?' on':'');$('#smConnect').textContent=on?'Close port':'Open port';
+  $('#smDev').textContent=on?(sm.name||'Serial port'):'No port open';$('#smSub').textContent=on?(sm.out?'Notes from the board go to '+sm.out.name+'.':'Port is open. Choose a MIDI output on the right.'):'Plug the board in, choose the speed it uses, then press Open port.';
+  $('#smIn').textContent=sm.nIn;$('#smOutN').textContent=sm.nOut;$('#smHeld').textContent=sm.held.size;$('#smSkip').textContent=sm.skip;$('#navS').textContent=on?'on':'';$('#smBaud').disabled=on}
+function smSend(m){if(!sm.out)return;try{sm.out.send(m)}catch(e){smLog('MIDI output error: '+e.message)}}
+function smTrack(m){const k=m[0]&0xF0,ch=m[0]&15;
+  if(k===0x90&&m[2]>0)sm.held.add(ch*256+m[1]);else if(k===0x80||(k===0x90&&m[2]===0))sm.held.delete(ch*256+m[1]);
+  else if(k===0xB0&&m[1]===64){if(m[2]>=64)sm.sus.add(ch);else sm.sus.delete(ch)}}
+function smRelease(){const n=sm.held.size+sm.sus.size;sm.held.forEach(x=>smSend([0x80|(x>>8),x&255,0]));sm.sus.forEach(ch=>smSend([0xB0|ch,64,0]));sm.held.clear();sm.sus.clear();if(n)smLog('released '+n+' stuck note/pedal states')}
+function smEmit(m){if(m[0]===0xF0){sm.skip++;return}                       // system exclusive needs extra browser permission; skipped
+  sm.nIn++;smTrack(m);smSend(m);if(sm.nIn<300||sm.nIn%50===0)smLog(m.map(x=>x.toString(16).padStart(2,'0')).join(' '));smUi()}
+async function smRead(parser){try{for(;;){const {value,done}=await sm.reader.read();if(done)break;if(value)for(const b of value)parser(b)}}catch(e){smLog('read stopped: '+e.message)}
+  if(sm.want){sm.want=false;smRelease();smLog('serial port closed by the device');smCleanup()}smUi()}
+async function smCleanup(){try{sm.reader&&sm.reader.releaseLock()}catch(e){}try{sm.writer&&sm.writer.releaseLock()}catch(e){}try{sm.port&&await sm.port.close()}catch(e){}sm.port=sm.reader=sm.writer=null;smUseIn(true);smUi()}
+async function smToggle(){
+  if(sm.want){sm.want=false;smRelease();try{await sm.reader.cancel()}catch(e){}await smCleanup();smLog('port closed');return}
+  if(!navigator.serial){toast('This browser cannot open serial ports. Use Chrome or Edge.');return}
+  try{const port=await navigator.serial.requestPort();await port.open({baudRate:+$('#smBaud').value});sm.port=port;sm.want=true;sm.name='Serial port, '+$('#smBaud').value+' baud';
+    sm.reader=port.readable.getReader();sm.writer=port.writable.getWriter();smLog('opened at '+$('#smBaud').value+' baud');smRead(MidiParser(smEmit));smUseIn();smUi()}
+  catch(e){sm.want=false;if(e.name!=='NotFoundError')toast('Serial port: '+e.message);await smCleanup()}}
+$('#smConnect').onclick=smToggle;
+function fillSerialPorts(list){const so=$('#smOut'),si=$('#smMidiIn'),wo=store.get('smout',''),wi=store.get('smin','');
+  so.innerHTML='<option value="">No output chosen</option>';si.innerHTML='<option value="">None</option>';
+  list.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;so.appendChild(o)});
+  [...bridge.access.inputs.values()].forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;si.appendChild(o)});
+  const bo=$('#bOut').value,pick=list.find(p=>p.name===wo)||list.find(p=>p.id!==bo&&/serial|hairless|loop/i.test(p.name));so.value=pick?pick.id:'';
+  const pi=[...bridge.access.inputs.values()].find(p=>p.name===wi);si.value=pi?pi.id:'';smUseOut();smUseIn()}
+function smUseOut(){smRelease();const id=$('#smOut').value;sm.out=id&&bridge.access?bridge.access.outputs.get(id):null;if(sm.out)store.set('smout',sm.out.name);smUi()}
+function smUseIn(close){if(sm.inp)sm.inp.onmidimessage=null;sm.inp=null;const id=$('#smMidiIn').value;if(close||!id||!bridge.access||!sm.want)return;sm.inp=bridge.access.inputs.get(id);if(!sm.inp)return;store.set('smin',sm.inp.name);
+  sm.inp.onmidimessage=e=>{if(!sm.writer)return;sm.nOut++;sm.writer.write(Uint8Array.from(e.data)).catch(()=>{});smUi()}}
+$('#smOut').onchange=()=>smUseOut();$('#smMidiIn').onchange=()=>smUseIn();
+smUi();
+
+/* ============================================================
+   SERIAL LINK (shared by both editors)
+   ============================================================ */
+function sLog(s){const el=$('#sLog');el.textContent+=s+'\n';if(el.textContent.length>12000)el.textContent=el.textContent.slice(-8000);el.scrollTop=1e9}
+$('#slClear').onclick=()=>$('#sLog').textContent='';
+class Link{
+  constructor(port){this.port=port;this.buf='';this.handler=null;this.q=Promise.resolve();this.open_=false}
+  async open(){
+    if(!this.port.readable){await this.port.open({baudRate:115200})}
+    try{await this.port.setSignals({dataTerminalReady:true,requestToSend:true})}catch(e){}
+    this.writer=this.port.writable.getWriter();this.reader=this.port.readable.getReader();this.open_=true;this.pump()}
+  async pump(){const d=new TextDecoder();try{for(;;){const {value,done}=await this.reader.read();if(done)break;if(value){this.buf+=d.decode(value,{stream:true});let i;while((i=this.buf.indexOf('\n'))>=0){const l=this.buf.slice(0,i).replace(/\r$/,'');this.buf=this.buf.slice(i+1);if(l.startsWith('KM ')){sLog('< '+(l.length>140?l.slice(0,140)+'…':l));if(this.handler)this.handler(l)}}}}}catch(e){}this.open_=false}
+  request(cmd,isDone,ms=2500){const run=()=>new Promise((res,rej)=>{const lines=[];let t;const fail=()=>{this.handler=null;rej(new Error('The pad did not answer "'+cmd.split(' ').slice(0,2).join(' ')+'" in time.'))};const arm=()=>{clearTimeout(t);t=setTimeout(fail,ms)};
+      this.handler=l=>{lines.push(l);arm();if(isDone(l,lines)){clearTimeout(t);this.handler=null;res(lines)}};arm();
+      sLog('> '+(cmd.length>140?cmd.slice(0,140)+'…':cmd));this.writer.write(new TextEncoder().encode(cmd+'\n')).catch(e=>{clearTimeout(t);this.handler=null;rej(e)})});
+    const p=this.q.then(run,run);this.q=p.catch(()=>{});return p}
+  async close(){this.open_=false;try{await this.reader.cancel()}catch(e){}try{this.reader.releaseLock()}catch(e){}try{this.writer.releaseLock()}catch(e){}try{await this.port.close()}catch(e){}this.reader=this.writer=null}
+}
+const isAck=l=>/^KM (OK|ERR|SAVED|NAME|KEY|ENC|ENABLE|PADNAME|LAUNCH)\b/.test(l);
+const lastOf=a=>a[a.length-1];
+
+/* ---------- firmware detection (same rules as studio-core firmware.rs) ---------- */
+function parseHello(line){const t=line.trim().split(/\s+/);if(t[0]!=='KM'||t[1]!=='HELLO')return null;const proto=+t[2],fw=t[6]||'?';
+  const h={proto,keys:+t[3],fw,cfgSize:+t[7]||0,raw:line};
+  if(proto>=2&&h.cfgSize>0)h.kind='midi';else if(proto===1)h.kind='macro';else h.kind=null;return h}
+
+/* ---------- pads page: connect, detect, open editor ---------- */
+const pad={port:null,link:null,hello:null,kind:null,demo:false};
+$('#pConnect').onclick=async()=>{
+  if(!navigator.serial){perr('This browser cannot talk to USB devices. Use Chrome or Edge.');return}
+  try{const port=await navigator.serial.requestPort();await attach(port)}catch(e){if(e.name!=='NotFoundError')perr('Could not connect: '+e.message)}};
+$('#pDemoMacro').onclick=()=>attach(makeSim('macro'),true);
+$('#pDemoMidi').onclick=()=>attach(makeSim('midi'),true);
+function perr(m){const e=$('#pErr');e.hidden=!m;e.textContent=m||''}
+async function attach(port,demo){
+  perr('');pad.port=port;pad.demo=!!demo;const link=new Link(port);
+  try{await link.open();let r;
+    try{r=await link.request('KM HELLO',l=>/^KM (HELLO|ERR)/.test(l),1500)}catch(e){r=await link.request('KM HELLO',l=>/^KM (HELLO|ERR)/.test(l),2500)}
+    const h=parseHello(lastOf(r));if(!h)throw new Error('This device answered, but not like a Feyonics pad: '+lastOf(r));if(!h.kind)throw new Error('This pad speaks protocol '+h.proto+', which this version of Studio does not know.');
+    pad.link=link;pad.hello=h;pad.kind=h.kind;$('#navP').textContent=h.kind==='midi'?'MIDI':'macro';
+    $('#padHome').hidden=true;$('#padHead').hidden=false;$('#phKind').textContent=(demo?'Demo · ':'')+(h.kind==='midi'?'MIDI pad':'Macro pad');$('#phName').textContent=h.kind==='midi'?'MIDI pad':'Macro pad';$('#phFw').textContent='firmware v'+h.fw;
+    if(h.kind==='macro'){$('#midiUI').hidden=true;$('#macroUI').hidden=false;await macroLoad()}else{$('#macroUI').hidden=true;$('#midiUI').hidden=false;await midiOpen()}
+  }catch(e){perr(e.message);await link.close();pad.port=pad.link=null}}
+async function detach(quiet){
+  if(pad.kind==='midi')await midiClose();
+  if(pad.link)await pad.link.close();
+  pad.port=pad.link=pad.hello=pad.kind=null;$('#navP').textContent='';$('#padHome').hidden=false;$('#padHead').hidden=true;$('#macroUI').hidden=true;$('#midiUI').hidden=true;$('#phBack').hidden=true;if(!quiet)toast('Disconnected from the pad.')}
+$('#phDisc').onclick=()=>detach();
+if(navigator.serial)navigator.serial.addEventListener('disconnect',e=>{if(pad.port&&e.target===pad.port){detach(true);perr('The pad was unplugged.')}});
+
+/* ============================================================
+   MIDI PAD: host the existing editor page and hand it our port
+   ============================================================ */
+const IDB={db:null,open(){return new Promise((res,rej)=>{const r=indexedDB.open('feyonics-web',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})},
+  async get(k){try{const db=await this.open();return await new Promise(res=>{const q=db.transaction('f').objectStore('f').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch(e){return null}},
+  async set(k,v){try{const db=await this.open();await new Promise(res=>{const t=db.transaction('f','readwrite');t.objectStore('f').put(v,k);t.oncomplete=res;t.onerror=res})}catch(e){}}};
+const SERIAL_PATCH='<scr'+'ipt>(function(){var P=function(){return parent.__feyonicsPort};var s=navigator.serial;if(!s){s={addEventListener:function(){},removeEventListener:function(){}};try{Object.defineProperty(navigator,"serial",{value:s,configurable:true})}catch(e){}}s.requestPort=function(){return Promise.resolve(P())};s.getPorts=function(){return Promise.resolve([P()])};})();<\/scr'+'ipt>';
+const isEditor=h=>typeof h==='string'&&/function encodeCfg/.test(h)&&/KM ZGET/.test(h)&&!/__studio/.test(h);   // the real MIDI editor, never this page itself
+async function editorHtml(){let h=await IDB.get('midi-editor-v2');if(isEditor(h))return h;
+  try{const r=await fetch('feyonics-studio.html',{cache:'no-cache'});if(r.ok){h=await r.text();if(isEditor(h)){await IDB.set('midi-editor-v2',h);return h}}}catch(e){}return null}
+async function midiOpen(){
+  const h=await editorHtml();$('#mframe').hidden=true;$('#midiLoad').hidden=false;if(!h){$('#midiMsg').textContent='';return}
+  await midiRun(h)}
+$('#midiFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;const h=await f.text();if(!isEditor(h)){$('#midiMsg').textContent='That file is not the MIDI pad editor (feyonics-studio.html). Choose the other one.';e.target.value='';return}await IDB.set('midi-editor-v2',h);await midiRun(h)};
+async function midiRun(html){
+  await pad.link.close();pad.link=null;window.__feyonicsPort=pad.port;                      // free the port; the editor opens it itself
+  const f=$('#mframe');f.srcdoc=html.replace(/<head[^>]*>/i,m=>m+SERIAL_PATCH);$('#midiLoad').hidden=true;f.hidden=false;
+  await new Promise(r=>{f.onload=r});
+  try{await f.contentWindow.connectPad()}catch(e){sLog('editor connect: '+e.message)}}
+async function midiClose(){
+  const f=$('#mframe');try{if(f.contentWindow&&f.contentWindow.disconnectPad)await f.contentWindow.disconnectPad(true)}catch(e){}f.hidden=true;f.removeAttribute('srcdoc');f.src='about:blank'}
+
+/* ============================================================
+   MACRO PAD: protocol codec (ported from studio-core macro_proto.rs)
+   ============================================================ */
+const NL=12,NK=16,NE=5,LABEL_MAX=13,TEXT_MAX=51,NAME_MAX=15,LAUNCH_MAX=23,OWNER_MAX=19,DEV_MAX=11;
+const T={NONE:0,TRANS:1,KEY:2,COMBO:3,TEXT:4,MEDIA:5,WHEEL:6};
+const mkA=(t=0,code=0,m1=0,m2=0,label='',text='')=>({t,code,m1,m2,label,text});
+const cleanA=a=>({t:a.t|0,code:a.code|0,m1:a.m1|0,m2:a.m2|0,label:ascii(a.label||'',LABEL_MAX),text:ascii(a.text||'',TEXT_MAX)});
+const cmdSetKey=(l,r,c,a)=>{a=cleanA(a);return `KM SETKEY ${l} ${r} ${c} ${a.t} ${a.code} ${a.m1} ${a.m2} ${toHex(a.label)} ${a.t===T.TEXT?toHex(a.text):'-'}`};
+const cmdSetEnc=(l,s,a)=>{a=cleanA(a);return `KM SETENC ${l} ${s} ${a.t} ${a.code} ${a.m1} ${a.m2} ${toHex(a.label)} ${a.t===T.TEXT?toHex(a.text):'-'}`};
+function parseAction(p){if(p.length<5)return null;return mkA(+p[0],+p[1],+p[2],+p[3],fromHex(p[4]),fromHex(p[5]||'-'))}
+const blankMacro=()=>({layers:Array.from({length:NL},(_,i)=>({name:'Layer '+(i+1),keys:Array.from({length:NK},()=>mkA()),enc:Array.from({length:NE},()=>mkA())})),enable:Array(NL).fill(false),launch:Array.from({length:NL},()=>({t:0,m1:0,m2:0,code:0,name:''})),padname:{owner:'',device:''}});
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+/* ---- key catalogue: Arduino Keyboard codes ---- */
+const KEYS=(()=>{const L=[];for(let i=0;i<26;i++)L.push([97+i,String.fromCharCode(65+i),'Letters']);for(let i=0;i<10;i++)L.push([48+i,String(i),'Digits']);
+  [[32,'Space','Editing'],[0xB0,'Enter','Editing'],[0xB1,'Esc','Editing'],[0xB3,'Tab','Editing'],[0xB2,'Backspace','Editing'],[0xD4,'Delete','Editing'],[0xD1,'Insert','Editing'],[0xC1,'Caps Lock','Editing'],
+   [0xDA,'Up','Navigation'],[0xD9,'Down','Navigation'],[0xD8,'Left','Navigation'],[0xD7,'Right','Navigation'],[0xD2,'Home','Navigation'],[0xD5,'End','Navigation'],[0xD3,'Page Up','Navigation'],[0xD6,'Page Down','Navigation']].forEach(x=>L.push(x));
+  for(let i=0;i<12;i++)L.push([0xC2+i,'F'+(i+1),'Function']);
+  ['`-=[]\\;\',./'].join('').split('').forEach(c=>L.push([c.charCodeAt(0),c,'Punctuation']));return L})();
+const KEYNAME=new Map(KEYS.map(k=>[k[0],k[1]]));
+const MODS=[[0,'None'],[0x80,'Ctrl'],[0x81,'Shift'],[0x82,'Alt'],[0x83,'Win']],MODNAME=new Map(MODS.map(m=>[m[0],m[1]]));
+const MEDIA=[[0xE9,'Volume up'],[0xEA,'Volume down'],[0xE2,'Mute'],[0xCD,'Play / pause'],[0xB5,'Next track'],[0xB6,'Previous track'],[0xB7,'Stop']],MEDIANAME=new Map(MEDIA);
+const keyName=c=>KEYNAME.get(c)||('Code '+c);
+const TYPE_LABEL=['Nothing','Same as layer 1','Key','Combo','Text','Media','Scroll'];
+function autoName(a){switch(a.t){case T.KEY:return keyName(a.code);case T.COMBO:return [a.m1,a.m2].filter(Boolean).map(m=>MODNAME.get(m)||'?').concat(keyName(a.code)).join('+');
+  case T.TEXT:return a.text.slice(0,12);case T.MEDIA:return MEDIANAME.get(a.code)||'Media';case T.WHEEL:return [a.m1,a.m2].filter(Boolean).map(m=>MODNAME.get(m)||'?').concat(a.code===2?'Scroll down':'Scroll up').join('+');case T.TRANS:return '= layer 1';default:return ''}}
+const tileName=a=>a.label||autoName(a);
+function defaultFor(t,isEnc){switch(t){case T.KEY:return mkA(T.KEY,97);case T.COMBO:return mkA(T.COMBO,99,0x80);case T.TEXT:return mkA(T.TEXT,0,0,0,'','Hello');case T.MEDIA:return mkA(T.MEDIA,0xE9);case T.WHEEL:return mkA(T.WHEEL,1);case T.TRANS:return isEnc?mkA():mkA(T.TRANS);default:return mkA()}}
+const THEMES=['Ocean','Sunset','Forest','Violet','Rose','Amber','Mono','Light','Slate','Mint','Nord','Dracula','Solar','Cyber','Lava','Ice','Coffee','Candy','Paper','Matrix','Snow','Sage','Mist','Blush','Graphite','Midnight'];
+const SKEYS=['theme','rotation','bright','use24h','usageApp','usageCode','aodPct','aodSec','usageStyle','btMode','fontScale','fontStyle','hideName'];
+const ENC_NAMES=['Left knob, clockwise','Left knob, counter-clockwise','Left knob, press','Display knob, clockwise','Display knob, counter-clockwise'];
+
+/* ---------- macro state ---------- */
+let M=null;const UI={tab:'keys',layer:0,kind:'key',idx:0,busy:'',msg:''};
+async function req(cmd,done,ms){return pad.link.request(cmd,done,ms)}
+async function setCmd(cmd){const r=await req(cmd,isAck,3000);const l=lastOf(r);if(/^KM ERR/.test(l))throw new Error(l.slice(7)||'The pad refused the command.');return l}
+async function macroLoad(){
+  UI.busy='Reading the pad…';M=null;macroRender();
+  M=blankMacro();
+  const g=await req('KM GET',l=>l==='KM END',12000);
+  for(const line of g){const p=line.split(/\s+/);const u=i=>+p[i];
+    if(p[1]==='NAME'&&u(2)<NL)M.layers[u(2)].name=ascii(fromHex(p[3]),NAME_MAX);
+    else if(p[1]==='KEY'&&u(2)<NL&&u(3)<4&&u(4)<4){const a=parseAction(p.slice(5));if(a)M.layers[u(2)].keys[u(3)*4+u(4)]=a}
+    else if(p[1]==='ENC'&&u(2)<NL&&u(3)<NE){const a=parseAction(p.slice(4));if(a)M.layers[u(2)].enc[u(3)]=a}}
+  const opt=async(cmd,done,fn)=>{try{fn(await req(cmd,done,3000))}catch(e){sLog('('+cmd+' not available: '+e.message+')')}};
+  await opt('KM ENABLEGET',l=>l==='KM END',r=>r.forEach(l=>{const p=l.split(/\s+/);if(p[1]==='ENABLE'&&+p[2]<NL)M.enable[+p[2]]=+p[3]!==0}));
+  await opt('KM LAUNCHGET',l=>l==='KM END',r=>r.forEach(l=>{const p=l.split(/\s+/);if(p[1]==='LAUNCH'&&+p[2]<NL)M.launch[+p[2]]={t:+p[3],m1:+p[4],m2:+p[5],code:+p[6],name:fromHex(p[7]||'-')}}));
+  await opt('KM PADNAMEGET',l=>/^KM (PADNAME|ERR)/.test(l),r=>{const p=lastOf(r).split(/\s+/);if(p[1]==='PADNAME')M.padname={owner:fromHex(p[2]),device:fromHex(p[3]||'-')}});
+  M.settings={};await opt('KM SETTINGS',l=>/^KM (SETTINGS|ERR)/.test(l),r=>{const p=lastOf(r).split(/\s+/);if(p[1]==='SETTINGS')SKEYS.forEach((k,i)=>M.settings[k]=+p[2+i])});
+  M.bt=null;await opt('KM BTSTATUS',l=>/^KM (BTSTATUS|ERR)/.test(l),r=>{const p=lastOf(r).split(/\s+/);if(p[1]==='BTSTATUS')M.bt={mode:+p[2],link:+p[3]!==0,state:+p[4],bonds:+p[5],pairLeft:+p[6],fw:p[7],name:fromHex(p[8]||'-')}});
+  M.snap=clone({layers:M.layers,enable:M.enable,launch:M.launch,padname:M.padname});
+  if(M.padname.device||M.padname.owner)$('#phName').textContent=(M.padname.owner+' '+M.padname.device).trim();
+  UI.busy='';UI.msg='Loaded from the pad.';macroRender()}
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+function macroDiff(){const c=[],S=M.snap;
+  M.layers.forEach((L,l)=>{const s=S.layers[l];if(L.name!==s.name)c.push({cmd:`KM SETNAME ${l} ${toHex(ascii(L.name,NAME_MAX))}`,what:`name of layer ${l+1}`});
+    L.keys.forEach((a,k)=>{if(!same(cleanA(a),cleanA(s.keys[k])))c.push({cmd:cmdSetKey(l,k>>2,k&3,a),what:`layer ${l+1} key ${k+1}`})});
+    L.enc.forEach((a,k)=>{if(!same(cleanA(a),cleanA(s.enc[k])))c.push({cmd:cmdSetEnc(l,k,a),what:`layer ${l+1} ${ENC_NAMES[k].toLowerCase()}`})})});
+  M.enable.forEach((e,l)=>{if(e!==S.enable[l])c.push({cmd:`KM ENABLESET ${l} ${e?1:0}`,what:`layer ${l+1} on/off`})});
+  M.launch.forEach((x,l)=>{if(!same(x,S.launch[l]))c.push({cmd:`KM LAUNCHSET ${l} ${x.t} ${x.m1} ${x.m2} ${x.code} ${toHex(ascii(x.name,LAUNCH_MAX))}`,what:`launch action of layer ${l+1}`})});
+  if(!same(M.padname,S.padname))c.push({cmd:`KM PADNAMESET ${toHex(ascii(M.padname.owner,OWNER_MAX))} ${toHex(ascii(M.padname.device,DEV_MAX))}`,what:'pad name'});
+  return c}
+async function macroSave(){
+  const d=macroDiff();if(!d.length){toast('Nothing to save.');return}
+  try{for(let i=0;i<d.length;i++){UI.busy=`Sending ${i+1} of ${d.length}…`;renderBar();
+      try{await setCmd(d[i].cmd)}catch(e){throw new Error(`The pad refused ${d[i].what}: ${e.message}`)}}
+    UI.busy='Saving on the pad…';renderBar();const r=await req('KM SAVE',l=>/^KM (SAVED|ERR)/.test(l),8000),l=lastOf(r);
+    if(/^KM ERR/.test(l))throw new Error(l.slice(7));
+    M.snap=clone({layers:M.layers,enable:M.enable,launch:M.launch,padname:M.padname});UI.msg='Saved on the pad.';toast('Saved on the pad.')}
+  catch(e){UI.msg=e.message;toast(e.message)}
+  UI.busy='';macroRender()}
+async function sendSetting(cmd,okMsg){try{await setCmd(cmd);UI.msg=okMsg||'Done.'}catch(e){UI.msg=e.message;toast(e.message)}renderBar()}
+const debounced={};function later(k,fn,ms=350){clearTimeout(debounced[k]);debounced[k]=setTimeout(fn,ms)}
+
+/* ---------- macro rendering ---------- */
+function curAction(){const L=M.layers[UI.layer];return UI.kind==='key'?L.keys[UI.idx]:L.enc[UI.idx]}
+function macroRender(){
+  const root=$('#macroUI');if(!M){root.innerHTML='<div class="card">'+esc(UI.busy||'')+'</div>';return}
+  const tabs=[['keys','Keys & knobs'],['layers','Layers'],['display','Display'],['bt','Bluetooth'],['pad','Pad & tools']];
+  root.innerHTML=`<div class="tabs" role="tablist">${tabs.map(t=>`<button class="tab" role="tab" data-tab="${t[0]}" aria-selected="${UI.tab===t[0]}">${t[1]}</button>`).join('')}</div>
+   <div id="mBody" style="margin-top:16px"></div><div class="save" id="mBar"></div>`;
+  renderBody();renderBar()}
+function renderBar(){const bar=$('#mBar');if(!bar||!M)return;const n=macroDiff().length;
+  if(!bar.firstChild)bar.innerHTML='<span class="dim" id="mMsg"></span><span class="row"><button class="btn small" data-a="reload">Reload from pad</button><button class="btn small solid" data-a="save">Save to pad</button></span>';
+  $('#mMsg').innerHTML=esc(UI.busy||UI.msg||'')+(n&&!UI.busy?(UI.msg?' · ':'')+`<b class="ok">${n} unsaved change${n>1?'s':''}</b>`:'');
+  bar.querySelector('[data-a=reload]').disabled=!!UI.busy;bar.querySelector('[data-a=save]').disabled=!!UI.busy||!n}
+function updateTiles(){const L=M.layers[UI.layer];$$('.tile[data-key]').forEach(t=>{const a=L.keys[+t.dataset.key];t.classList.toggle('none',a.t===T.NONE);t.querySelector('.n').textContent=tileName(a);t.querySelector('.t').textContent=(+t.dataset.key===0?'knob spot · ':'')+(TYPE_LABEL[a.t]||'?')});
+  $$('.tile[data-enc]').forEach(t=>{const a=L.enc[+t.dataset.enc];t.classList.toggle('none',a.t===T.NONE);t.querySelector('.n').textContent=tileName(a)||'—'});
+  const lab=$('#insp [data-f=label]');if(lab)lab.placeholder=autoName(curAction())}
+function renderBody(){const b=$('#mBody');({keys:bodyKeys,layers:bodyLayers,display:bodyDisplay,bt:bodyBt,pad:bodyPad})[UI.tab](b)}
+function bodyKeys(b){
+  const L=M.layers[UI.layer];
+  const strip=M.layers.map((l,i)=>`<button class="lbtn ${M.enable[i]?'':'off'}" data-layer="${i}" aria-pressed="${i===UI.layer}">${esc(l.name||'Layer '+(i+1))}<small>${i+1}${M.enable[i]?'':' · off'}</small></button>`).join('');
+  const tiles=L.keys.map((a,k)=>`<button class="tile ${a.t===T.NONE?'none':''} ${k===0?'knob':''}" data-key="${k}" aria-pressed="${UI.kind==='key'&&UI.idx===k}" aria-label="Key ${k+1}"><span class="t">${k===0?'knob spot · ':''}${TYPE_LABEL[a.t]||'?'}</span><span class="n">${esc(tileName(a))}</span></button>`).join('');
+  const encs=L.enc.map((a,k)=>`<button class="tile kslot ${a.t===T.NONE?'none':''}" data-enc="${k}" aria-pressed="${UI.kind==='enc'&&UI.idx===k}"><span class="t">${ENC_NAMES[k]}</span><span class="n">${esc(tileName(a)||'—')}</span></button>`).join('');
+  b.innerHTML=`<div class="lstrip" role="group" aria-label="Layers">${strip}</div>
+   <div class="split"><div class="card"><span class="lab">Keys</span><div class="kgrid" style="margin-top:12px">${tiles}</div><div class="lab" style="margin-top:18px">Knobs</div><div class="krow">${encs}</div></div>
+   <div class="card white" id="insp"></div></div>`;renderInspector()}
+function modSel(id,v,label){return `<label class="fl">${label}<select data-f="${id}">${MODS.map(m=>`<option value="${m[0]}" ${m[0]===v?'selected':''}>${m[1]}</option>`).join('')}</select></label>`}
+function keySel(v){const groups={};KEYS.forEach(k=>(groups[k[2]]=groups[k[2]]||[]).push(k));const known=KEYNAME.has(v);
+  return `<label class="fl">Key<select data-f="code">${known?'':`<option value="${v}" selected>Code ${v}</option>`}${Object.entries(groups).map(([g,l])=>`<optgroup label="${g}">${l.map(k=>`<option value="${k[0]}" ${k[0]===v?'selected':''}>${esc(k[1])}</option>`).join('')}</optgroup>`).join('')}</select></label>`}
+function renderInspector(){
+  const el=$('#insp');if(!el)return;const a=curAction(),isEnc=UI.kind==='enc';
+  const title=isEnc?ENC_NAMES[UI.idx]:`Layer ${UI.layer+1}, key ${UI.idx+1} (row ${(UI.idx>>2)+1}, column ${(UI.idx&3)+1})`;
+  const types=[T.NONE,...(isEnc?[]:[T.TRANS]),T.KEY,T.COMBO,T.TEXT,T.MEDIA,T.WHEEL];
+  let f='';
+  if(a.t===T.KEY)f=keySel(a.code);
+  else if(a.t===T.COMBO)f=`<div class="two">${modSel('m1',a.m1,'First modifier')}${modSel('m2',a.m2,'Second modifier')}</div>${keySel(a.code)}<p class="help">A combo holds up to two modifiers and one key.</p>`;
+  else if(a.t===T.TEXT)f=`<label class="fl">Text to type (${TEXT_MAX} characters at most)<textarea data-f="text" rows="3" maxlength="${TEXT_MAX}" style="min-height:70px">${esc(a.text)}</textarea></label>`;
+  else if(a.t===T.MEDIA)f=`<label class="fl">Media key<select data-f="code">${MEDIA.map(m=>`<option value="${m[0]}" ${m[0]===a.code?'selected':''}>${m[1]}</option>`).join('')}</select></label>`;
+  else if(a.t===T.WHEEL)f=`<label class="fl">Direction<select data-f="code"><option value="1" ${a.code!==2?'selected':''}>Scroll up</option><option value="2" ${a.code===2?'selected':''}>Scroll down</option></select></label><div class="two">${modSel('m1',a.m1,'Hold modifier')}${modSel('m2',a.m2,'Hold modifier 2')}</div>`;
+  else if(a.t===T.TRANS)f='<p class="help">This key does whatever the same key does on layer 1.</p>';
+  el.innerHTML=`<span class="lab">${esc(title)}</span><div class="form"><label class="fl">What it does<select data-f="type">${types.map(t=>`<option value="${t}" ${t===a.t?'selected':''}>${TYPE_LABEL[t]}</option>`).join('')}</select></label>${f}
+   ${a.t!==T.NONE?`<label class="fl">Name shown on the pad (${LABEL_MAX} characters at most)<input data-f="label" maxlength="${LABEL_MAX}" value="${esc(a.label)}" placeholder="${esc(autoName(a))}"></label>`:''}</div>
+   <div class="row" style="margin-top:14px"><button class="btn small" data-a="copyall">Copy to every layer</button><button class="btn small" data-a="clear">Clear</button></div>`}
+function bodyLayers(b){
+  b.innerHTML=`<div class="card"><span class="lab">Layers</span><p class="help">Turn layers on or off, rename them, and choose what opens when you switch to a layer. Layer 1 is always on.</p><div class="swrap"><table><thead><tr><th>#</th><th>Name</th><th>On</th><th>Launch on switch</th><th>Modifier</th><th>Modifier 2</th><th>Key</th><th>Name</th></tr></thead><tbody>
+  ${M.layers.map((L,l)=>{const x=M.launch[l];return `<tr><td class="mono">${l+1}</td><td><input data-ln="${l}" maxlength="${NAME_MAX}" value="${esc(L.name)}"></td>
+   <td><input type="checkbox" data-en="${l}" ${M.enable[l]?'checked':''} ${l===0?'disabled checked':''}></td>
+   <td><select data-lt="${l}"><option value="0" ${x.t===0?'selected':''}>Nothing</option><option value="1" ${x.t===1?'selected':''}>Start search</option><option value="2" ${x.t===2?'selected':''}>Shortcut</option></select></td>
+   <td><select data-lm1="${l}" ${x.t!==2?'disabled':''}>${MODS.map(m=>`<option value="${m[0]}" ${m[0]===x.m1?'selected':''}>${m[1]}</option>`).join('')}</select></td>
+   <td><select data-lm2="${l}" ${x.t!==2?'disabled':''}>${MODS.map(m=>`<option value="${m[0]}" ${m[0]===x.m2?'selected':''}>${m[1]}</option>`).join('')}</select></td>
+   <td><select data-lk="${l}" ${x.t!==2?'disabled':''}>${KEYNAME.has(x.code)?'':`<option value="${x.code}" selected>Code ${x.code}</option>`}${KEYS.map(k=>`<option value="${k[0]}" ${k[0]===x.code?'selected':''}>${esc(k[1])}</option>`).join('')}</select></td>
+   <td><input data-lnm="${l}" maxlength="${LAUNCH_MAX}" value="${esc(x.name)}" ${x.t===0?'disabled':''} placeholder="${x.t===1?'what to search':'label'}"></td></tr>`}).join('')}
+  </tbody></table></div></div>`}
+function sliderRow(label,key,min,max,cmd,suffix=''){const v=M.settings[key];return `<label class="fl">${label} <span class="mono" id="v-${key}">${v===undefined||isNaN(v)?'—':v+suffix}</span><input type="range" data-set="${key}" data-cmd="${cmd}" min="${min}" max="${max}" value="${isNaN(v)?min:v}" ${v===undefined||isNaN(v)?'disabled':''}></label>`}
+function bodyDisplay(b){const S=M.settings||{};const ok=!isNaN(S.theme);
+  b.innerHTML=`<div class="grid"><div class="card c7"><span class="lab">Screen</span>${ok?'':'<p class="err">This firmware did not report its display settings.</p>'}
+   <div class="form"><div class="two"><label class="fl">Colour theme<select data-sel="theme" data-cmd="THEME">${THEMES.map((t,i)=>`<option value="${i}" ${i===S.theme?'selected':''}>${t}</option>`).join('')}</select></label>
+   <label class="fl">Orientation<select data-sel="rotation" data-cmd="ROTATE">${['Normal','Rotated 90°','Upside down','Rotated 270°'].map((t,i)=>`<option value="${i}" ${i===S.rotation?'selected':''}>${t}</option>`).join('')}</select></label></div>
+   ${sliderRow('Brightness','bright',0,100,'BRIGHT','%')}
+   <div class="two"><label class="fl">Text size<select data-sel="fontScale" data-cmd="FONT">${[[-1,'Smaller'],[0,'Normal'],[1,'Larger']].map(o=>`<option value="${o[0]}" ${o[0]===S.fontScale?'selected':''}>${o[1]}</option>`).join('')}</select></label>
+   <label class="fl">Usage style<select data-sel="usageStyle" data-cmd="USAGESTYLE">${[0,1,2,3,4,5].map(i=>`<option value="${i}" ${i===S.usageStyle?'selected':''}>Style ${i+1}</option>`).join('')}</select></label></div>
+   <label class="row"><input type="checkbox" data-chk="hideName" ${S.hideName?'checked':''}> Hide the pad name on the screen</label>
+   <p class="help">Clock format: ${S.use24h?'24-hour':'12-hour'} (change it on the pad).</p></div></div>
+   <div class="card dark c5"><span class="lab">Always-on display</span><div class="form">${sliderRow('Dim to','aodPct',0,100,'AODPCT','%')}<label class="fl">Dim after (seconds idle)<input type="number" min="0" max="3600" data-num="aodSec" data-cmd="AODSEC" value="${isNaN(S.aodSec)?'':S.aodSec}"></label></div>
+   <div class="lab" style="margin-top:20px">Usage on the Claude layers</div><div class="two" style="margin-top:8px"><label class="fl">Claude app %<input type="number" min="0" max="100" id="uApp" value="${isNaN(S.usageApp)||S.usageApp<0?'':S.usageApp}"></label><label class="fl">Claude Code %<input type="number" min="0" max="100" id="uCode" value="${isNaN(S.usageCode)||S.usageCode<0?'':S.usageCode}"></label></div><div class="row" style="margin-top:10px"><button class="btn small" data-a="usage">Show on pad</button></div></div>
+   <div class="card c12"><span class="lab">Test the hardware</span><div class="row" style="margin-top:10px"><button class="btn small" data-a="keytest">Key test</button>${[0,1,2,3,4,5,6,7,8].map(i=>`<button class="btn small" data-scr="${i}">Screen ${i}</button>`).join('')}<button class="btn small" data-a="home">Back to home screen</button></div></div></div>`}
+const BTSTATE=['Idle','Advertising','Pairing','Connected'];
+function bodyBt(b){const B=M.bt,S=M.settings||{};
+  b.innerHTML=`<div class="grid"><div class="card c7"><span class="lab">Bluetooth</span>${B?`<div class="stats"><div class="stat"><span class="lab">Link</span><b>${B.link?'up':'down'}</b></div><div class="stat"><span class="lab">State</span><b style="font-size:16px">${BTSTATE[B.state]||B.state}</b></div><div class="stat"><span class="lab">Paired PCs</span><b>${B.bonds}</b></div><div class="stat"><span class="lab">Module</span><b style="font-size:16px">v${esc(B.fw)}</b></div></div>`:'<p class="err">This pad did not report its Bluetooth status.</p>'}
+   <div class="form"><label class="fl">Send keys over<select id="btMode"><option value="0" ${S.btMode===0?'selected':''}>USB only</option><option value="1" ${S.btMode===1?'selected':''}>Bluetooth only</option><option value="2" ${S.btMode===2?'selected':''}>Automatic</option></select></label>
+   <label class="fl">Name your PC sees (${14} characters at most)<span class="row"><input id="btName" maxlength="14" value="${esc(B?B.name:'')}" style="flex:1"><button class="btn small" data-a="btname">Set</button></span></label></div>
+   <div class="row" style="margin-top:14px"><button class="btn small solid" data-a="pair">Start pairing</button><button class="btn small" data-a="pairstop">Stop pairing</button><button class="btn small danger" data-a="forget">Forget all paired PCs</button><button class="btn small" data-a="btrefresh">Refresh</button></div>
+   <p class="help">Pairing stays open for about two minutes. Pair from the PC's Bluetooth settings while it is open. Forgetting PCs means you pair again.</p></div></div>`}
+function bodyPad(b){
+  b.innerHTML=`<div class="grid"><div class="card c7"><span class="lab">Pad name</span><div class="two form"><label class="fl">Owner (${OWNER_MAX} characters)<input id="pnOwner" maxlength="${OWNER_MAX}" value="${esc(M.padname.owner)}"></label><label class="fl">Device (${DEV_MAX} characters)<input id="pnDev" maxlength="${DEV_MAX}" value="${esc(M.padname.device)}"></label></div><p class="help">Shown on the pad's screen. Saved with the other changes.</p>
+   <div class="lab" style="margin-top:22px">Clock</div><div class="row" style="margin-top:8px"><button class="btn small" data-a="time">Set the pad's clock to this computer</button></div>
+   <div class="lab" style="margin-top:22px">Backup</div><div class="row" style="margin-top:8px"><button class="btn small" data-a="export">Save layout to a file</button><label class="btn small" style="cursor:pointer;display:inline-flex;align-items:center">Load layout from a file<input type="file" id="impFile" accept=".json,application/json" hidden></label></div></div>
+   <div class="card dark c5"><span class="lab">Careful</span><div class="form"><button class="btn danger" data-a="defaults">Put all keys back to the defaults</button><button class="btn danger" data-a="factory">Factory reset everything</button><button class="btn" data-a="update">Restart the pad for a firmware update</button></div><p class="help">Defaults and factory reset change the pad straight away. The update button makes the pad appear as a drive named RPI-RP2.</p></div></div>`}
+
+/* ---------- macro events ---------- */
+$('#macroUI').addEventListener('click',async e=>{
+  const t=e.target.closest('[data-tab],[data-layer],[data-key],[data-enc],[data-a],[data-scr]');if(!t||!M)return;const d=t.dataset;
+  if(d.tab){UI.tab=d.tab;macroRender();return}
+  if(d.layer!==undefined){UI.layer=+d.layer;renderBody();return}
+  if(d.key!==undefined){UI.kind='key';UI.idx=+d.key;renderBody();return}
+  if(d.enc!==undefined){UI.kind='enc';UI.idx=+d.enc;renderBody();return}
+  if(d.scr!==undefined){sendSetting('KM SCREENTEST '+d.scr);return}
+  const a=d.a;
+  if(a==='save')await macroSave();
+  else if(a==='reload'){if(macroDiff().length&&!confirm('Throw away your unsaved changes and read the pad again?'))return;try{await macroLoad()}catch(x){UI.busy='';UI.msg=x.message;macroRender()}}
+  else if(a==='clear'){Object.assign(curAction(),mkA());renderBody();renderBar()}
+  else if(a==='copyall'){const src=cleanA(curAction());M.layers.forEach((L,i)=>{if(i!==UI.layer){const tgt=UI.kind==='key'?L.keys:L.enc;tgt[UI.idx]=src.t===T.TRANS&&UI.kind==='enc'?mkA():clone(src)}});toast('Copied to every layer. Save to send it.');renderBar()}
+  else if(a==='keytest')sendSetting('KM KEYTEST');else if(a==='home')sendSetting('KM HOME');
+  else if(a==='usage'){const ap=$('#uApp').value,cd=$('#uCode').value;if(ap!=='')await sendSetting(`KM USAGE 1 ${clamp(+ap,0,100)}`,'Usage sent.');if(cd!=='')await sendSetting(`KM USAGE 2 ${clamp(+cd,0,100)}`,'Usage sent.')}
+  else if(a==='pair')sendSetting('KM BTPAIR 1','Pairing is open.');else if(a==='pairstop')sendSetting('KM BTPAIR 0','Pairing stopped.');
+  else if(a==='forget'){if(confirm('Forget every PC this pad is paired with?'))sendSetting('KM BTFORGET','Forgot all paired PCs.')}
+  else if(a==='btname'){const n=ascii($('#btName').value.trim(),14);if(!n){toast('Type a name first.');return}sendSetting('KM BTNAME '+toHex(n),'Bluetooth name set.')}
+  else if(a==='btrefresh'){try{const r=await req('KM BTSTATUS',l=>/^KM (BTSTATUS|ERR)/.test(l),3000),p=lastOf(r).split(/\s+/);if(p[1]==='BTSTATUS'){M.bt={mode:+p[2],link:+p[3]!==0,state:+p[4],bonds:+p[5],pairLeft:+p[6],fw:p[7],name:fromHex(p[8]||'-')};renderBody()}}catch(x){toast(x.message)}}
+  else if(a==='time'){const n=new Date();sendSetting(`KM TIME ${n.getFullYear()} ${n.getMonth()+1} ${n.getDate()} ${n.getHours()} ${n.getMinutes()} ${n.getSeconds()}`,'Clock set.')}
+  else if(a==='defaults'){if(confirm('Put every key on every layer back to the factory layout? This happens on the pad right away.')){await sendSetting('KM DEFAULTS','Defaults restored.');try{await macroLoad()}catch(x){}}}
+  else if(a==='factory'){if(confirm('Factory reset erases the layout, settings and Bluetooth pairings. Continue?')){await sendSetting('KM FACTORYRESET','Factory reset sent.');try{await macroLoad()}catch(x){}}}
+  else if(a==='update'){if(confirm('The pad will restart as a drive named RPI-RP2 and disconnect from Studio.')){try{pad.link.writer.write(new TextEncoder().encode('KM UPDATE\n'))}catch(x){}toast('Restarting for update.');setTimeout(()=>detach(true),500)}}
+  else if(a==='export'){const blob=new Blob([JSON.stringify({v:1,fw:pad.hello.fw,layers:M.layers,enable:M.enable,launch:M.launch,padname:M.padname},null,1)],{type:'application/json'}),u=document.createElement('a');u.href=URL.createObjectURL(blob);u.download='feyonics-macro-layout.json';u.click();setTimeout(()=>URL.revokeObjectURL(u.href),2000)}
+});
+async function onEdit(e){
+  const el=e.target;if(!M)return;
+  if(el.id==='impFile'){const f=el.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.v!==1||!Array.isArray(j.layers)||j.layers.length!==NL)throw new Error('This is not a Feyonics macro layout file.');
+      j.layers.forEach((L,l)=>{M.layers[l].name=ascii(L.name,NAME_MAX);M.layers[l].keys=L.keys.slice(0,NK).map(cleanA);M.layers[l].enc=L.enc.slice(0,NE).map(cleanA)});M.enable=j.enable.slice(0,NL).map(Boolean);M.enable[0]=true;M.launch=j.launch.slice(0,NL);M.padname=j.padname||M.padname;
+      UI.msg='Layout loaded. Press Save to send it to the pad.';macroRender()}catch(x){toast(x.message)}el.value='';return}
+  const f=el.dataset.f;
+  if(f){const a=curAction();
+    if(f==='type'){const keep=a.label;Object.assign(a,defaultFor(+el.value,UI.kind==='enc'));a.label=+el.value===T.NONE?'':keep;renderBody();renderBar();return}
+    a[f]=el.tagName==='TEXTAREA'||f==='label'?el.value:+el.value;updateTiles();renderBar();return}
+  if(el.dataset.ln!==undefined){M.layers[+el.dataset.ln].name=ascii(el.value,NAME_MAX);renderBar();return}
+  if(el.dataset.en!==undefined){M.enable[+el.dataset.en]=el.checked;renderBar();return}
+  const lk=['lt','lm1','lm2','lk','lnm'].find(k=>el.dataset[k]!==undefined);
+  if(lk){const l=+el.dataset[lk],x=M.launch[l];if(lk==='lt'){x.t=+el.value;if(x.t===0)Object.assign(x,{m1:0,m2:0,code:0,name:''});else if(x.t===1)Object.assign(x,{m1:0x83,m2:0,code:0});else if(!x.code){x.m1=0x80;x.code=97}}else if(lk==='lm1')x.m1=+el.value;else if(lk==='lm2')x.m2=+el.value;else if(lk==='lk')x.code=+el.value;else x.name=ascii(el.value,LAUNCH_MAX);
+    if(lk==='lt')bodyLayers($('#mBody'));renderBar();return}
+  if(el.dataset.sel){M.settings[el.dataset.sel]=+el.value;const c=el.dataset.cmd;await sendSetting(c==='FONT'?`KM FONT ${el.value} ${M.settings.fontStyle||0}`:`KM ${c} ${el.value}`,'Applied on the pad.');return}
+  if(el.dataset.chk){M.settings.hideName=el.checked?1:0;await sendSetting('KM HIDENAME '+(el.checked?1:0),'Applied on the pad.');return}
+  if(el.dataset.num){const v=clamp(Math.round(+el.value||0),0,3600);M.settings[el.dataset.num]=v;await sendSetting(`KM ${el.dataset.cmd} ${v}`,'Applied on the pad.');return}
+  if(el.id==='btMode'){M.settings.btMode=+el.value;await sendSetting('KM BTMODE '+el.value,'Output mode changed.');return}
+  if(el.id==='pnOwner'||el.id==='pnDev'){M.padname={owner:ascii($('#pnOwner').value,OWNER_MAX),device:ascii($('#pnDev').value,DEV_MAX)};renderBar()}
+}
+$('#macroUI').addEventListener('change',onEdit);
+$('#macroUI').addEventListener('input',e=>{const el=e.target;if(!M)return;
+  if(el.matches('textarea,input[data-f],input[data-ln],input[data-lnm],#pnOwner,#pnDev'))onEdit(e);   // text fields apply as you type, so Save never waits on a blur
+  if(el.dataset.set){const v=+el.value;M.settings[el.dataset.set]=v;const o=$('#v-'+el.dataset.set);if(o)o.textContent=v+'%';later(el.dataset.set,()=>sendSetting(`KM ${el.dataset.cmd} ${v}`,'Applied on the pad.'))}});
+
+/* ============================================================
+   SIMULATED PADS (for the demo buttons and for testing)
+   ============================================================ */
+function makeSim(kind){
+  const enc=new TextEncoder(),dec=new TextDecoder();let ctrl=null;
+  const out=l=>{try{ctrl&&ctrl.enqueue(enc.encode(l+'\n'))}catch(e){}};
+  const factory=['My macros','Claude app','Claude Code','DaVinci','Onshape','KiCad','OBS Studio','VS Code','Photoshop','Ableton Live','Discord','Excel'];
+  const S=kind==='macro'?{layers:factory.map((n,l)=>({name:n,keys:Array.from({length:16},(_,k)=>l===0&&k===1?[3,99,128,0,'Copy','']:l===0&&k===2?[3,118,128,0,'Paste','']:l===0&&k===3?[4,0,0,0,'Email','hello@example.com']:l===0&&k===5?[5,0xE9,0,0,'Vol +','']:[0,0,0,0,'','']),enc:[[5,0xE9,0,0,'Vol +',''],[5,0xEA,0,0,'Vol -',''],[5,0xE2,0,0,'Mute',''],[6,1,0,0,'',''],[6,2,0,0,'','']]})),
+    enable:factory.map((_,i)=>i<5),launch:factory.map(()=>[0,0,0,0,'']),pad:['Demo','Pad'],set:[0,0,80,1,-1,-1,20,30,0,2,0,0,0],bt:[2,0,0,1,0,'1.0.0','4465 6D6F'.replace(' ','')]}
+    :{blob:(()=>{const z=new Uint8Array(596);z[0]=0x5A;z[1]=2;z[11]=100;z[12]=1;z[13]=3;z[14]=12;return z})()};
+  S.log=[];
+  const ok=()=>out('KM OK'),A=a=>a.slice(0,2).join(' ')+' '+a.slice(2).map(x=>x===''?'-':toHex(x)).join(' ');
+  function macro(p){const c=p[0],u=i=>+p[i];
+    switch(c){
+      case 'HELLO':out('KM HELLO 1 12 4 4 1.24.2');break;
+      case 'GET':S.layers.forEach((L,l)=>{out(`KM NAME ${l} ${toHex(L.name)}`);L.keys.forEach((a,k)=>out(`KM KEY ${l} ${k>>2} ${k&3} ${a[0]} ${a[1]} ${a[2]} ${a[3]} ${toHex(a[4])} ${a[0]===4?toHex(a[5]):'-'}`));L.enc.forEach((a,k)=>out(`KM ENC ${l} ${k} ${a[0]} ${a[1]} ${a[2]} ${a[3]} ${toHex(a[4])} ${a[0]===4?toHex(a[5]):'-'}`))});out('KM END');break;
+      case 'SETKEY':S.layers[u(1)].keys[u(2)*4+u(3)]=[u(4),u(5),u(6),u(7),fromHex(p[8]),fromHex(p[9])];S.log.push(p.join(' '));ok();break;
+      case 'SETENC':if(u(3)===1){out('KM ERR TRANS not allowed on a knob');break}S.layers[u(1)].enc[u(2)]=[u(3),u(4),u(5),u(6),fromHex(p[7]),fromHex(p[8])];S.log.push(p.join(' '));ok();break;
+      case 'SETNAME':S.layers[u(1)].name=fromHex(p[2]);S.log.push(p.join(' '));ok();break;
+      case 'SAVE':{const n=S.layers.reduce((s,L)=>s+L.keys.reduce((q,a)=>q+(a[0]?8+a[4].length+a[5].length:0),0),0);S.log.push('SAVE');out(n>S.cap?`KM ERR keymap too big to save (${n} of ${S.cap} bytes); shorten some text macros`:'KM SAVED');break}
+      case 'DEFAULTS':S.layers.forEach(L=>{L.keys.forEach((a,k)=>{L.keys[k]=[0,0,0,0,'','']})});ok();break;
+      case 'SETTINGS':out('KM SETTINGS '+S.set.join(' '));break;
+      case 'THEME':S.set[0]=u(1);ok();break;case 'ROTATE':S.set[1]=u(1);ok();break;case 'BRIGHT':S.set[2]=u(1);ok();break;case 'AODPCT':S.set[6]=u(1);ok();break;case 'AODSEC':S.set[7]=u(1);ok();break;case 'USAGESTYLE':S.set[8]=u(1);ok();break;case 'FONT':S.set[10]=u(1);ok();break;case 'HIDENAME':S.set[12]=u(1);ok();break;
+      case 'USAGE':S.set[3+u(1)]=u(2);ok();break;
+      case 'ENABLEGET':S.enable.forEach((e,l)=>out(`KM ENABLE ${l} ${e?1:0}`));out('KM END');break;
+      case 'ENABLESET':if(u(1)===0&&u(2)===0){out('KM ERR layer 1 cannot be turned off');break}S.enable[u(1)]=!!u(2);ok();break;
+      case 'LAUNCHGET':S.launch.forEach((x,l)=>out(`KM LAUNCH ${l} ${x[0]} ${x[1]} ${x[2]} ${x[3]} ${toHex(x[4])}`));out('KM END');break;
+      case 'LAUNCHSET':S.launch[u(1)]=[u(2),u(3),u(4),u(5),fromHex(p[6])];ok();break;
+      case 'PADNAMEGET':out(`KM PADNAME ${toHex(S.pad[0])} ${toHex(S.pad[1])}`);break;
+      case 'PADNAMESET':S.pad=[fromHex(p[1]),fromHex(p[2])];ok();break;
+      case 'BTSTATUS':out(`KM BTSTATUS ${S.set[9]} ${S.bt[1]} ${S.bt[2]} ${S.bt[3]} ${S.bt[4]} ${S.bt[5]} ${S.bt[6]}`);break;
+      case 'BTMODE':S.set[9]=u(1);ok();break;case 'BTPAIR':S.bt[2]=u(1)?2:0;S.bt[4]=u(1)?120:0;ok();break;case 'BTFORGET':S.bt[3]=0;ok();break;case 'BTNAME':S.bt[6]=p[1];ok();break;
+      case 'TIME':case 'KEYTEST':case 'SCREENTEST':case 'HOME':case 'FACTORYRESET':case 'LAYER':S.log.push(p.join(' '));ok();break;
+      case 'UPDATE':break;
+      default:out('KM ERR unknown command')}}
+  function midi(p){switch(p[0]){case 'HELLO':out('KM HELLO 2 4 4 4 2.0.0 596');break;
+    case 'ZGET':out('KM ZDATA '+[...S.blob].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase());break;
+    case 'ZPUT':if((p[1]||'').length!==1192){out('KM ERR wrong size');break}S.blob=Uint8Array.from(p[1].match(/../g),x=>parseInt(x,16));ok();break;
+    case 'ZAPPLY':out('KM SAVED');break;case 'STATUS':out('KM STATUS 1 0 100 2 0 0 0');break;default:out('KM ERR unknown command')}}
+  S.cap=4000;
+  const handle=line=>{const p=line.trim().split(/\s+/);if(p[0]!=='KM')return;p.shift();(kind==='macro'?macro:midi)(p)};
+  const port={_open:false,readable:null,writable:null,sim:S,
+    async open(){if(this._open)throw new DOMException('The port is already open.','InvalidStateError');this._open=true;let buf='';
+      this.readable=new ReadableStream({start(c){ctrl=c}});this.writable=new WritableStream({write(chunk){buf+=dec.decode(chunk,{stream:true});let i;while((i=buf.indexOf('\n'))>=0){const l=buf.slice(0,i).replace(/\r$/,'');buf=buf.slice(i+1);setTimeout(()=>handle(l),2)}}})},
+    async close(){if(!this._open)return;if((this.readable&&this.readable.locked)||(this.writable&&this.writable.locked))throw new TypeError('Cannot close a port while its streams are locked.');this._open=false;this.readable=this.writable=null;ctrl=null},
+    async setSignals(){},getInfo(){return{usbVendorId:0x2E8A,usbProductId:kind==='macro'?1:2}},addEventListener(){},removeEventListener(){}};
+  return port}
+
+window.__studio={sm,MidiParser,bridge,pad,get M(){return M},UI,Link,makeSim,bleParse,parseHello,macroDiff,cmdSetKey,cmdSetEnc,toHex,fromHex,show,midiSend};
+</script></body></html>

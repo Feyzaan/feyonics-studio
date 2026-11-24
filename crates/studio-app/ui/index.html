@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feyonics Studio</title>
+<style>
+:root{--ink:#f4f4f2;--dim:#a3a3a0;--faint:#6d6d6a;--glass:rgba(255,255,255,.07);--glass2:rgba(255,255,255,.12);--line:rgba(255,255,255,.14);--card:#161616;--white:#f4f4f2;--onwhite:#141414;--ok:#e9e9e6;--bad:#ff8a80}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:15px/1.45 "Segoe UI Variable","Segoe UI",system-ui,sans-serif;color:var(--ink);background:radial-gradient(1200px 700px at 15% -10%,#3a3a3a 0,transparent 60%),radial-gradient(900px 600px at 100% 110%,#2b2b2b 0,transparent 55%),#0c0c0c;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:230px minmax(0,1fr);gap:18px;padding:18px;min-height:100%}
+.side{position:sticky;top:18px;align-self:start;height:calc(100vh - 36px);background:var(--glass);border:1px solid var(--line);border-radius:26px;backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);padding:20px 14px;display:flex;flex-direction:column;gap:6px}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 10px 18px;font-weight:700;letter-spacing:.02em}
+.logo i{width:26px;height:26px;border-radius:9px;background:var(--white);display:block;position:relative}
+.logo i:after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--onwhite)}
+.nav{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;color:var(--dim);background:none;border:0;font:inherit;text-align:left;cursor:pointer}
+.nav:hover{background:var(--glass)}.nav[aria-current=page]{background:var(--white);color:var(--onwhite);font-weight:600}
+.nav .tag{margin-left:auto;font-size:11px;opacity:.7}
+.nav:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--white);outline-offset:2px}
+.sp{flex:1}.foot{color:var(--faint);font-size:12px;padding:0 10px}
+main{display:grid;gap:18px;align-content:start;min-width:0}
+h1{font-size:28px;margin:6px 4px 0;letter-spacing:-.02em}.sub{color:var(--dim);margin:0 4px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+.card{border-radius:26px;padding:22px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);min-width:0}
+.card.dark{background:var(--card)}.card.white{background:var(--white);color:var(--onwhite);border-color:transparent}.card.white .dim{color:#5f5f5c}
+.c4{grid-column:span 4}.c5{grid-column:span 5}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+@media(max-width:1100px){.c4,.c5,.c7,.c8{grid-column:span 12}}
+@media(max-width:760px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap}.sp,.foot{display:none}}
+.dim{color:var(--dim)}.lab{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.card.white .lab{color:#6a6a66}
+.big{font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1.05;margin:8px 0 4px}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 12px;background:var(--glass2);font-size:13px}
+.card.white .pill{background:#e4e4e0}.dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}.dot.on{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.2)}.card.white .dot.on{background:#141414;box-shadow:0 0 0 4px rgba(0,0,0,.15)}
+.btn{border:1px solid var(--line);background:var(--glass2);color:var(--ink);border-radius:999px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer;min-height:40px}
+.btn:hover{background:rgba(255,255,255,.2)}.btn.solid{background:var(--white);color:var(--onwhite);border-color:transparent}.btn.solid:hover{background:#fff}
+.card.white .btn{background:var(--onwhite);color:#fff;border-color:transparent}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row.sb{justify-content:space-between}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.stat{background:var(--glass);border-radius:16px;padding:12px}.card.white .stat{background:#e9e9e5}.stat b{display:block;font-size:22px;letter-spacing:-.02em}
+.log{font:12px/1.55 Consolas,ui-monospace,monospace;color:var(--dim);height:230px;overflow:auto;white-space:pre-wrap;margin-top:12px;padding-right:6px}
+.err{color:var(--bad);margin-top:10px;font-size:14px}
+.form{display:grid;gap:12px;margin-top:14px}.form label{display:grid;gap:6px;color:var(--dim);font-size:13px}
+input,select{background:rgba(0,0,0,.35);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;min-height:42px;width:100%}
+.spark{height:70px;margin-top:14px;display:block;width:100%}
+.dev{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.dev:first-child{border-top:0}
+.badge{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--white);color:var(--onwhite)}
+.page[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body><div class="app">
+<nav class="side" aria-label="Sections">
+  <div class="logo"><i></i>Feyonics Studio</div>
+  <button class="nav" data-p="bridge" aria-current="page">Bluetooth bridge</button>
+  <button class="nav" data-p="routes">Connections</button>
+  <button class="nav" data-p="pads">My pads <span class="tag" id="navTag"></span></button>
+  <button class="nav" data-p="settings">Settings</button>
+  <div class="sp"></div><div class="foot" id="foot">prototype</div>
+</nav>
+<main>
+<section class="page" id="p-bridge">
+  <h1>Bluetooth bridge</h1><p class="sub">Your pad, over Bluetooth, appears as a MIDI port in any music app.</p>
+  <div class="grid" style="margin-top:18px">
+    <div class="card white c7">
+      <div class="row sb"><span class="lab">Pad</span><span class="pill"><span class="dot" id="dot"></span><span id="phase">Idle</span></span></div>
+      <div class="big" id="dev">Looking for your pad</div>
+      <div class="dim" id="devsub">Turn the pad on. It connects by itself.</div>
+      <div class="stats">
+        <div class="stat"><span class="lab">Messages</span><b id="sMsg">0</b></div>
+        <div class="stat"><span class="lab">Packets</span><b id="sPkt">0</b></div>
+        <div class="stat"><span class="lab">Dropped</span><b id="sDrop">0</b></div>
+        <div class="stat"><span class="lab">Reconnects</span><b id="sRec">0</b></div>
+      </div>
+      <svg class="spark" id="spark" viewBox="0 0 300 70" preserveAspectRatio="none" aria-label="Messages per second"><polyline fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round" id="line"/></svg>
+    </div>
+    <div class="card dark c5">
+      <span class="lab">MIDI output</span>
+      <div class="big" style="font-size:26px" id="port">Not open</div>
+      <div class="err" id="portErr" hidden></div>
+      <div class="row" style="margin-top:16px"><button class="btn solid" id="test">Send test note</button><button class="btn" id="reopen">Reconnect port</button></div>
+      <p class="dim" style="font-size:13px">Pick this port as the MIDI input in your music app.</p>
+    </div>
+    <div class="card c12"><div class="row sb"><span class="lab">Activity</span></div><div class="log" id="log"></div></div>
+  </div>
+</section>
+
+<section class="page" id="p-routes" hidden>
+  <h1>Connections</h1><p class="sub">Each connection moves MIDI from a source to a destination. This replaces loopMIDI, MIDIberry and Hairless in one place.</p>
+  <div class="grid" style="margin-top:18px">
+    <div class="card c12" id="plan"></div>
+    <div class="card c12"><div class="row sb"><span class="lab">Your connections</span><div class="row"><button class="btn" id="rAdd">Add connection</button><button class="btn solid" id="rSave">Apply</button></div></div>
+      <div id="rList"></div><div class="err" id="rErr" hidden></div><span class="dim" id="rOk"></span></div>
+  </div>
+</section>
+
+<section class="page" id="p-pads" hidden>
+  <h1>My pads</h1><p class="sub">Plug the pad in with USB. Studio finds out which pad it is and opens the right editor.</p>
+  <div class="grid" style="margin-top:18px">
+    <div class="card c7"><div class="row sb"><span class="lab">USB devices</span><button class="btn solid" id="detect">Look for pads</button></div><div id="devs" class="dim" style="margin-top:10px">Nothing checked yet.</div></div>
+    <div class="card dark c5"><span class="lab">Editor</span><div class="big" style="font-size:26px" id="editor">No pad selected</div><p class="dim" id="editorSub">Connect a pad over USB, then press "Look for pads".</p></div>
+  </div>
+</section>
+
+<section class="page" id="p-settings" hidden>
+  <h1>Settings</h1><p class="sub">Saved on this PC.</p>
+  <div class="grid" style="margin-top:18px"><div class="card c7"><div class="form">
+    <label>MIDI output port name (part of the name is enough)<input id="cPort" list="ports"><datalist id="ports"></datalist></label>
+    <label>Bluetooth device name contains<input id="cDev"></label>
+    <div class="row"><button class="btn solid" id="save">Save</button><span class="dim" id="saved"></span></div>
+  </div></div></div>
+</section>
+</main></div>
+<script>
+const T='__TOKEN__', $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api=(p,o={})=>fetch(p,{...o,headers:{'X-Token':T,...(o.headers||{})}});
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.removeAttribute('aria-current'));b.setAttribute('aria-current','page');document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='p-'+b.dataset.p);});
+const hist=Array(60).fill(0);let lastMsg=null,cfgLoaded=false;
+const PH={idle:'Waiting',scanning:'Searching',connecting:'Connecting',connected:'Connected'};
+async function tick(){
+ try{const s=await (await api('/api/state')).json(),b=s.bridge;
+  $('#phase').textContent=PH[b.phase]||b.phase;$('#dot').className='dot'+(b.phase==='connected'?' on':'');
+  $('#dev').textContent=b.phase==='connected'?b.device:(b.phase==='idle'?'Pad not connected':'Looking for your pad');
+  $('#devsub').textContent=b.last_error&&b.phase!=='connected'?b.last_error:(b.phase==='connected'?'Playing notes now sends them to your music app.':'Turn the pad on. It connects by itself.');
+  $('#sMsg').textContent=b.stats.messages;$('#sPkt').textContent=b.stats.packets;$('#sDrop').textContent=b.stats.dropped;$('#sRec').textContent=b.stats.reconnects;
+  if(lastMsg!==null){hist.push(b.stats.messages-lastMsg);hist.shift();}lastMsg=b.stats.messages;
+  const mx=Math.max(4,...hist);$('#line').setAttribute('points',hist.map((v,i)=>`${i*300/59},${64-v/mx*58}`).join(' '));
+  $('#port').textContent=s.midi_port||'Not open';const pe=$('#portErr');pe.hidden=!s.midi_error;pe.textContent=s.midi_error||'';
+  $('#log').textContent=s.log.join('\n');$('#log').scrollTop=1e9;
+  S=s;window._rs=s.routes;$('#plan').innerHTML=planText(s.plan);if(!rLoaded){R=JSON.parse(JSON.stringify(s.route_defs));rLoaded=true;drawRoutes(s.routes)}else if(!document.activeElement||!$('#rList').contains(document.activeElement)){}
+  { document.querySelectorAll('#rList [data-pill]').forEach(p=>{const x=s.routes.find(y=>y.id===p.dataset.pill);p.lastChild.textContent=x?(PH[x.state.phase]||x.state.phase)+' · '+x.state.stats.messages:'off';p.firstChild.className='dot'+(x&&x.state.phase==='connected'?' on':'')});}
+  $('#foot').textContent=s.sim?'simulated pad':'prototype';
+  $('#ports').innerHTML=s.ports.map(p=>`<option value="${esc(p)}">`).join('');
+  if(!cfgLoaded){$('#cPort').value=s.config.midi_port_name;$('#cDev').value=s.config.device_name_filter;cfgLoaded=true;window._cfg=s.config;}
+ }catch(e){$('#phase').textContent='Studio stopped';}
+}
+
+let R=[],rLoaded=false,S={ports:[],midi_inputs:[],serial_ports:[]};
+const opt=(arr,v)=>arr.concat(arr.includes(v)||!v?[]:[v]).map(p=>`<option ${p===v?'selected':''}>${esc(p)}</option>`).join('');
+const BAUDS=[9600,31250,38400,57600,115200,230400,250000,500000,1000000];
+function drawRoutes(st){
+ $('#rList').innerHTML=R.map((r,i)=>{const so=r.source,sk=r.sink,state=(st||[]).find(x=>x.id===r.id);
+  const ser=(o,k)=>`<select data-i="${i}" data-k="${k}.port">${opt(S.serial_ports,o.port)}</select><select data-i="${i}" data-k="${k}.baud">${BAUDS.map(b=>`<option ${b===o.baud?'selected':''}>${b}</option>`).join('')}</select>`;
+  const from=so.kind==='ble'?`<input data-i="${i}" data-k="source.name_filter" placeholder="Bluetooth name contains (empty = any pad)" value="${esc(so.name_filter||'')}">`:so.kind==='serial'?ser(so,'source'):`<select data-i="${i}" data-k="source.port">${opt(S.midi_inputs,so.port)}</select>`;
+  const to=sk.kind==='serial'?ser(sk,'sink'):`<input data-i="${i}" data-k="sink.port" list="outs" placeholder="MIDI port name" value="${esc(sk.port)}">`;
+  return `<div class="dev" style="align-items:flex-start;flex-wrap:wrap"><label class="row"><input type="checkbox" style="width:auto;min-height:0" data-i="${i}" data-k="enabled" ${r.enabled?'checked':''}> <input data-i="${i}" data-k="name" value="${esc(r.name)}" style="width:210px" aria-label="Name"></label>
+  <div class="row" style="flex:1;min-width:300px"><select data-i="${i}" data-k="source.kind"><option value="ble" ${so.kind==='ble'?'selected':''}>Bluetooth pad</option><option value="serial" ${so.kind==='serial'?'selected':''}>Serial port</option><option value="midi_in" ${so.kind==='midi_in'?'selected':''}>MIDI input</option></select>${from}
+  <span class="dim">→</span><select data-i="${i}" data-k="sink.kind"><option value="midi_out" ${sk.kind==='midi_out'?'selected':''}>MIDI output</option><option value="serial" ${sk.kind==='serial'?'selected':''}>Serial port</option></select>${to}</div>
+  <div class="row"><span class="pill" data-pill="${esc(r.id)}"><span class="dot ${state&&state.state.phase==='connected'?'on':''}"></span><span>${state?(PH[state.state.phase]||state.state.phase)+' · '+state.state.stats.messages:'off'}</span></span><button class="btn" data-del="${i}">Remove</button></div></div>`}).join('')||'<p class="dim">No connections yet.</p>';
+ $('#rList').insertAdjacentHTML('beforeend','<datalist id="outs">'+S.ports.map(p=>`<option value="${esc(p)}">`).join('')+'</datalist>');
+}
+$('#rList').addEventListener('change',e=>{const t=e.target,i=t.dataset.i;if(i===undefined)return;const r=R[i],k=t.dataset.k;let v=t.type==='checkbox'?t.checked:t.value;
+ if(k.endsWith('.baud'))v=+v;
+ if(k==='source.kind')r.source=v==='ble'?{kind:'ble',name_filter:''}:v==='serial'?{kind:'serial',port:S.serial_ports[0]||'',baud:115200}:{kind:'midi_in',port:S.midi_inputs[0]||''};
+ else if(k==='sink.kind')r.sink=v==='serial'?{kind:'serial',port:S.serial_ports[0]||'',baud:115200}:{kind:'midi_out',port:'Feyonics Pad'};
+ else if(k.includes('.')){const[a,b]=k.split('.');r[a][b]=v}else r[k]=v;
+ if(k.endsWith('kind'))drawRoutes(window._rs)});
+$('#rList').addEventListener('click',e=>{const d=e.target.dataset.del;if(d!==undefined){R.splice(+d,1);drawRoutes(window._rs)}});
+$('#rAdd').onclick=()=>{R.push({id:'r'+Date.now().toString(36),name:'New connection',enabled:true,source:{kind:'serial',port:S.serial_ports[0]||'',baud:115200},sink:{kind:'midi_out',port:'Feyonics Serial'}});drawRoutes(window._rs)};
+$('#rSave').onclick=async()=>{const r=await api('/api/routes',{method:'POST',body:JSON.stringify(R)});const e=$('#rErr');
+ if(r.ok){e.hidden=true;$('#rOk').textContent='Applied.';setTimeout(()=>$('#rOk').textContent='',2500)}else{let m='';try{m=JSON.parse(await r.text()).map(x=>x.message).join(' ')}catch(_){m='Could not apply.'}e.hidden=false;e.textContent=m}};
+function planText(p){return p.plan==='create_native'?`<b>Virtual ports: Studio creates its own</b> <span class="dim">(${esc(p.backend)})</span>`:p.plan==='use_existing'?`<b>Virtual ports: use ${esc(p.tool)}</b><div class="dim">${esc(p.note)}</div>`:`<b>Virtual ports need one-time setup</b><ul class="dim">${p.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`}
+setInterval(tick,700);tick();
+$('#test').onclick=()=>api('/api/test-note',{method:'POST'});
+$('#reopen').onclick=()=>api('/api/config',{method:'POST',body:JSON.stringify(window._cfg)});
+$('#save').onclick=async()=>{window._cfg={...window._cfg,midi_port_name:$('#cPort').value,device_name_filter:$('#cDev').value};await api('/api/config',{method:'POST',body:JSON.stringify(window._cfg)});$('#saved').textContent='Saved.';setTimeout(()=>$('#saved').textContent='',2000);};
+$('#detect').onclick=async()=>{$('#devs').textContent='Checking…';
+ const r=await (await api('/api/detect',{method:'POST'})).json();
+ if(!r.length){$('#devs').textContent='No USB serial devices found.';return;}
+ $('#devs').innerHTML=r.map(d=>{const k=d.kind;return `<div class="dev"><div style="flex:1"><b>${esc(d.product||d.port)}</b><div class="dim">${esc(d.port)}${d.hello?' · firmware '+esc(d.hello.fw||'?'):''}${d.error?' · '+esc(d.error):''}</div></div>${k?`<span class="badge">${k==='midi'?'MIDI pad':'Macro pad'}</span>`:''}</div>`}).join('');
+ const f=r.find(d=>d.kind);if(f){$('#editor').textContent=f.kind==='midi'?'MIDI pad editor':'Macro pad editor';$('#editorSub').textContent=f.kind==='midi'?'Chords, scales, keys and knobs. (Screen being built.)':'12 layers, keys, knobs and display. (Screen being built.)';$('#navTag').textContent=f.kind==='midi'?'MIDI':'Macro';}
+};
+</script></body></html>

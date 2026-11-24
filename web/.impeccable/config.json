@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "instrument sans",
+        "createdAt": "2026-11-09T17:37:19.898Z",
+        "reason": "Instrument Sans is part of the macro editor's established type set (Instrument Sans / IBM Plex Mono / Newsreader) that the user asked to keep; carried over from the project, not a fresh default"
+      }
+    ]
+  }
+}
